@@ -1,0 +1,3 @@
+from modules.language_detection_request.database.language_detection_request_result.orm_entity import *
+from modules.language_detection_request.database.language_detection_request_result.orm_mapper import *
+from modules.language_detection_request.database.language_detection_request_result.repository import *

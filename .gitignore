@@ -1,0 +1,17 @@
+*.pyc
+__pycache__/
+.idea/
+docker/data/
+.pytest_cache/
+dump.rdb
+.venv
+.env.development
+.env.production
+.env.shared
+static/task_result/*
+static/file_translation/*
+static/*
+.vscode
+static/task_result/
+static/speech_recognition/*
+.env
