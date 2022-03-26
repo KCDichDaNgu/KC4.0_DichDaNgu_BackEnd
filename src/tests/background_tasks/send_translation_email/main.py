@@ -20,7 +20,6 @@ from email.message import EmailMessage
 import pandas as pd
 import random
 import pymongo
-import asyncio
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -384,13 +383,13 @@ async def test_send_email_result_for_text_translation():
     print('== Test content and result is logged at: ', save_path)
 
 
-async def test_main():
-    print('========== START TEST SEND TRANSLATION EMAIL - MAIN =============')
-    try:
-        await main()
-        print("Main run without crash!")
-    except Exception as e:
-        print("False, Main crash!")
-    print('=========== DONE TEST SEND TRANSLATION EMAIL - MAIN =============')
+# async def test_main():
+#     print('========== START TEST SEND TRANSLATION EMAIL - MAIN =============')
+#     try:
+#         await main()
+#         print("Main run without crash!")
+#     except Exception as e:
+#         print("False, Main crash!")
+#     print('=========== DONE TEST SEND TRANSLATION EMAIL - MAIN =============')
 
 

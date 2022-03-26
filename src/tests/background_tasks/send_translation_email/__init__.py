@@ -1,9 +1,8 @@
 
 
 def add_fresh_jobs(background_task_scheduler, BACKGROUND_TASKS):
-    
+
     from tests.background_tasks.send_translation_email.main import test_send_email_result_for_text_translation
-    from tests.background_tasks.send_translation_email.main import test_send_email_result_for_file_translation
     
     background_task_1_conf = BACKGROUND_TASKS['test_send_email_result_for_text_translation']
     
@@ -20,9 +19,8 @@ def add_fresh_jobs(background_task_scheduler, BACKGROUND_TASKS):
     return background_task_scheduler
     
 
-def add_fresh_jobs_2(background_task_scheduler, BACKGROUND_TASKS):
+def add_fresh_jobs_1(background_task_scheduler, BACKGROUND_TASKS):
     
-    from tests.background_tasks.send_translation_email.main import test_send_email_result_for_text_translation
     from tests.background_tasks.send_translation_email.main import test_send_email_result_for_file_translation
     
     background_task_1_conf = BACKGROUND_TASKS['test_send_email_result_for_file_translation']

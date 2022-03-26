@@ -2,9 +2,9 @@
 
 def add_fresh_jobs(background_task_scheduler, BACKGROUND_TASKS):
     
-    from tests.background_tasks.delete_invalid_file.main import test_all
+    from tests.background_tasks.delete_invalid_task.main import test_all
     
-    background_task_conf = BACKGROUND_TASKS['delete_invalid_file.test_all']
+    background_task_conf = BACKGROUND_TASKS['delete_invalid_task.test_all']
     
     if background_task_scheduler.get_job(background_task_conf.ID) != None:
         background_task_scheduler.remove_job(background_task_conf.ID)
