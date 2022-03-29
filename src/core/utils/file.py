@@ -196,11 +196,11 @@ def get_worksheet_file_meta(worksheet_file: File):
 
     return binary_worksheet, total_sheets, total_cells, character_count
 
-def get_txt_file_meta(txt_file: File, lang_code):
+def get_txt_file_meta(txt_file: File):
 
     full_text = (txt_file.body.decode('utf-16', errors="ignore"))
     
-    character_count = count_chars(full_text, lang_code)
+    character_count = count_chars(full_text)
 
     # characters = re.split('[;.?!。]', full_text)
 
