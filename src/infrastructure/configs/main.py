@@ -384,6 +384,90 @@ class AppConfig(BaseModel):
         ),
     }
 
+    TEST_BACKGROUND_TASKS: Dict[str, BackgroundTask] = {
+        "delete_invalid_file.test_all": BackgroundTask(
+            ID="delete_invalid_task.test_all",
+            TRIGGER=BackgroundTaskTriggerEnum.interval.value,
+            CONFIG=dict(seconds=0, max_instances=1),
+        ),
+        "delete_invalid_task.test_all": BackgroundTask(
+            ID="delete_invalid_task.test_all",
+            TRIGGER=BackgroundTaskTriggerEnum.interval.value,
+            CONFIG=dict(seconds=0, max_instances=1),
+        ),
+
+        "test_translate_plain_text_created_by_private_request.translate_content.main": BackgroundTask(
+            ID="test_translate_plain_text_created_by_private_request.translate_content.main",
+            TRIGGER=BackgroundTaskTriggerEnum.interval.value,
+            CONFIG=dict(seconds=5, max_instances=1),
+        ),
+
+        "test_translate_plain_text_created_by_private_request.translate_content.read_task_result": BackgroundTask(
+            ID="test_translate_plain_text_created_by_private_request.translate_content.read_task_result",
+            TRIGGER=BackgroundTaskTriggerEnum.interval.value,
+            CONFIG=dict(seconds=5, max_instances=1),
+        ),
+
+        "test_translate_plain_text_created_by_private_request.translate_content.execute_in_batch": BackgroundTask(
+            ID="test_translate_plain_text_created_by_private_request.translate_content.execute_in_batch",
+            TRIGGER=BackgroundTaskTriggerEnum.interval.value,
+            CONFIG=dict(seconds=5, max_instances=1),
+        ),
+        
+        "test_translate_plain_text_created_by_private_request.translate_content.mark_invalid_tasks": BackgroundTask(
+            ID="test_translate_plain_text_created_by_private_request.translate_content.mark_invalid_tasks",
+            TRIGGER=BackgroundTaskTriggerEnum.interval.value,
+            CONFIG=dict(seconds=5, max_instances=1),
+        ),
+
+        "test_detect_plain_text_language_created_by_private_request": BackgroundTask(
+            ID="test_detect_plain_text_language_created_by_private_request",
+            TRIGGER=BackgroundTaskTriggerEnum.interval.value,
+            CONFIG=dict(seconds=5, max_instances=1),
+        ),
+        "test_detect_plain_text_language_created_by_public_request": BackgroundTask(
+            ID="test_detect_plain_text_language_created_by_public_request",
+            TRIGGER=BackgroundTaskTriggerEnum.interval.value,
+            CONFIG=dict(seconds=5, max_instances=1),
+        ),
+         "test_send_transaction_email": BackgroundTask(
+            ID="test_send_transactino_email",
+            TRIGGER=BackgroundTaskTriggerEnum.interval.value,
+            CONFIG=dict(seconds=0, max_instances=1),
+        ),
+        "test_translate_file_created_by_private_request.translate_content.docx": BackgroundTask(
+            ID="test_translate_file_created_by_private_request.translate_content.docx",
+            TRIGGER=BackgroundTaskTriggerEnum.interval.value,
+            CONFIG=dict(seconds=0, max_instances=1),
+        ),
+        "test_translate_file_created_by_private_request.translate_content.pptx": BackgroundTask(
+            ID="test_translate_file_created_by_private_request.translate_content.pptx",
+            TRIGGER=BackgroundTaskTriggerEnum.interval.value,
+            CONFIG=dict(seconds=0, max_instances=1)
+        ),
+        "test_translate_file_created_by_private_request.translate_content.txt": BackgroundTask(
+            ID="test_translate_file_created_by_private_request.translate_content.txt",
+            TRIGGER=BackgroundTaskTriggerEnum.interval.value,
+            CONFIG=dict(seconds=0, max_instances=1),
+        ),
+
+        "test_send_email_result_for_text_translation": BackgroundTask(
+            ID="test_send_email_result_for_text_translation",
+            TRIGGER=BackgroundTaskTriggerEnum.interval.value,
+            CONFIG=dict(seconds=0, max_instances=1),
+        ),
+        "test_send_email_result_for_file_translation": BackgroundTask(
+            ID="test_send_email_result_for_file_translation",
+            TRIGGER=BackgroundTaskTriggerEnum.interval.value,
+            CONFIG=dict(seconds=0, max_instances=1),
+        ),
+        "test_send_translation_email_main": BackgroundTask(
+            ID="test_send_translation_email_main",
+            TRIGGER=BackgroundTaskTriggerEnum.interval.value,
+            CONFIG=dict(seconds=0, max_instances=1),
+        )
+    }   
+    
     MAX_QUERY_SIZE = 10
 
 
