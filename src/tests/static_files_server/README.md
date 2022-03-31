@@ -22,3 +22,10 @@ After compare them, main.py will delete the file.
 
 Also check the status code when request.
 
+All Test got 200.
+
+### Non-OK Test 
+
+Mutated URL, by randomly change a character.
+All test got 404.
+
