@@ -74,6 +74,38 @@ def get_all_text_json(filename):
     return data
 
 
+def mutating_path(path):
+    components = path.split('/')
+    components[-1]
+
+    if random.random() < 0.5:
+        pos = random.randint(1, len(components[-2]) - 1)
+        if components[-2][pos] == 'a':
+            components[-2] = components[-2][:pos] + 'b' + components[-2][pos + 1:]
+        else:
+            components[-2] = components[-2][:pos] + 'a' + components[-2][pos + 1:] 
+
+        pos = random.randint(1, len(components[-1]) - 1)
+        if components[-1][pos] == 'a':
+            components[-1] = components[-2][:pos] + 'b' + components[-1][pos + 1:]
+        else:
+            components[-1] = components[-2][:pos] + 'a' + components[-1][pos + 1:] 
+    else:
+        if random.random() < 0.5:
+            pos = random.randint(1, len(components[-2]) - 1)
+            if components[-2][pos] == 'a':
+                components[-2] = components[-2][:pos] + 'b' + components[-2][pos + 1:]
+            else:
+                components[-2] = components[-2][:pos] + 'a' + components[-2][pos + 1:] 
+        else:
+            pos = random.randint(1, len(components[-1]) - 1)
+            if components[-1][pos] == 'a':
+                components[-1] = components[-2][:pos] + 'b' + components[-1][pos + 1:]
+            else:
+                components[-1] = components[-2][:pos] + 'a' + components[-1][pos + 1:] 
+    return '/'.join(components)
+
+
 class TestStaticFilesServer(unittest2.TestCase):
     def __init__(self, *args, **kwargs):
         super(TestStaticFilesServer, self).__init__(*args, **kwargs)
@@ -118,6 +150,18 @@ class TestStaticFilesServer(unittest2.TestCase):
                 self.assertEqual(get_all_text_xlsx(saved_path), get_all_text_xlsx(path), "failed at {}".format(path))
 
             os.remove(saved_path)
+
+
+    def test_not_ok_test(self):
+        mutated_filepaths = []
+        for filepaths in self.filepaths:
+            mutated_filepaths.append(mutating_path(filepaths))
+
+        for _, path in tqdm.tqdm(enumerate(mutated_filepaths)):
+            saved_path, status_code, message = read_and_save(url_gen(path))
+            
+            self.assertEqual(status_code, 404, "failed at {}".format(path))
+            self.assertEqual(str(message), "404 Client Error: Not Found for url: {}".format(url_gen(path)), "failed at {}".format(path))
                 
 
 
