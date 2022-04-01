@@ -64,7 +64,7 @@ class CreatePlainTextTranslationRequest(HTTPMethodView):
         user = await get_me(request)
         data = request.json 
         
-        if not self.is_allowed_total_chars(len(data['sourceText'])): 
+        if not await self.is_allowed_total_chars(len(data['sourceText'])): 
             return ArgumentOutOfRangeException(
                 message=MESSAGES['total_chars_exceeded_allowed'],
                 metadata=dict(
