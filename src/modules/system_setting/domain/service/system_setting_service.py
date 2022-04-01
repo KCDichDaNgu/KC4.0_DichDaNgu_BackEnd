@@ -30,7 +30,9 @@ class SystemSettingDService():
                     translation_speed_for_each_character=command.translation_speed_for_each_character,
                     language_detection_speed=command.language_detection_speed,
                     email_for_sending_email=command.email_for_sending_email,
-                    email_password_for_sending_email=command.email_password_for_sending_email
+                    email_password_for_sending_email=command.email_password_for_sending_email,
+                    allowed_total_chars_for_text_translation=command.allowed_total_chars_for_text_translation,
+                    allowed_file_size_in_mb_for_file_translation=command.allowed_file_size_in_mb_for_file_translation,
                 )
                 
                 updated_setting = await self.__system_setting_repository.update(saved_setting, conditions)

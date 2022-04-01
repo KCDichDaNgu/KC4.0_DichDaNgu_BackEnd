@@ -8,6 +8,8 @@ from sanic import response
 from modules.translation_request.commands.create_plain_text_translation_request.request_dto import CreatePlainTextTranslationRequestDto
 from infrastructure.configs.main import StatusCodeEnum, GlobalConfig, get_cnf
 
+from core.exceptions.argument_out_of_range import ArgumentOutOfRangeException
+
 from sanic_openapi import doc
 from sanic.views import HTTPMethodView
 from modules.translation_request.dtos.plain_text_translation_response import PlainTextTranslationRequestResponse
@@ -26,9 +28,24 @@ class CreatePlainTextTranslationRequest(HTTPMethodView):
 
         from modules.translation_request.commands.create_plain_text_translation_request.service import CreatePlainTextTranslationRequestService
         from modules.user.commands.update_user_statistic.service import UpdateUserStatisticService
+        from modules.system_setting.database.repository import SystemSettingRepository
 
         self.__create_plain_text_translation_request_service = CreatePlainTextTranslationRequestService()
         self.__update_user_statistic = UpdateUserStatisticService()
+        
+        self.__system_setting_repo = SystemSettingRepository()
+        
+    async def is_allowed_total_chars(self, total_chars):
+        
+        system_setting = await self.__system_setting_repo.find_one({})
+        
+        allowed_total_chars_for_text_translation = system_setting.props.allowed_total_chars_for_text_translation
+        
+        if total_chars > allowed_total_chars_for_text_translation:
+            return False
+        
+        return True
+
 
     @doc.summary(APP_CONFIG.ROUTES['translation_request.text_translation.create']['summary'])
     @doc.description(APP_CONFIG.ROUTES['translation_request.text_translation.create']['desc'])
@@ -46,6 +63,15 @@ class CreatePlainTextTranslationRequest(HTTPMethodView):
 
         user = await get_me(request)
         data = request.json 
+        
+        if not self.is_allowed_total_chars(len(data['sourceText'])): 
+            return ArgumentOutOfRangeException(
+                message=MESSAGES['total_chars_exceeded_allowed'],
+                metadata=dict(
+                    code=StatusCodeEnum.failed.value,
+                    data={}
+                )
+            )
 
         if request.headers.get('Authorization') and user:        
             translation_response = await self.create_private_plain_text_translation_request(data, user)

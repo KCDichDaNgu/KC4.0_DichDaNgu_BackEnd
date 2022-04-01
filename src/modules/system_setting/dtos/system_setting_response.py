@@ -38,6 +38,14 @@ class DataStructure:
     emailPasswordForSendingEmail = doc.String(
         description='emailPasswordForSendingEmail'
     )
+    
+    allowedTotalCharsForTextTranslation = doc.Integer(
+        description='allowedTotalCharsForTextTranslation'
+    )
+    
+    allowedFileSizeInMbForFileTranslation = doc.Float(
+        description='allowedFileSizeInMbForFileTranslation'
+    )
 
 class SystemSettingResponse(ResponseBase):
 
