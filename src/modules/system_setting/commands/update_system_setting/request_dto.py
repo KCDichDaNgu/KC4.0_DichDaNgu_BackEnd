@@ -38,3 +38,11 @@ class UpdateSystemSettingDto(UpdateSystemSetting):
     emailPasswordForSendingEmail = doc.String(
         description='emailPasswordForSendingEmail'
     )
+    
+    allowedTotalCharsForTextTranslation = doc.Integer(
+        description='allowedTotalCharsForTextTranslation'
+    )
+    
+    allowedFileSizeInMbForFileTranslation = doc.Float(
+        description='allowedFileSizeInMbForFileTranslation'
+    )

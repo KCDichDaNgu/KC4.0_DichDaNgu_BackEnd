@@ -28,6 +28,8 @@ class SystemSettingOrmMapper(OrmMapperBase[SystemSettingEntity, SystemSettingOrm
             'language_detection_speed': props.language_detection_speed,
             'email_for_sending_email': props.email_for_sending_email,
             'email_password_for_sending_email': props.email_password_for_sending_email,
+            'allowed_total_chars_for_text_translation': props.allowed_total_chars_for_text_translation,
+            'allowed_file_size_in_mb_for_file_translation': props.allowed_file_size_in_mb_for_file_translation,
         }
 
         return orm_props
@@ -44,6 +46,8 @@ class SystemSettingOrmMapper(OrmMapperBase[SystemSettingEntity, SystemSettingOrm
             'language_detection_speed': orm_entity.language_detection_speed,
             'email_for_sending_email': orm_entity.email_for_sending_email,
             'email_password_for_sending_email': orm_entity.email_password_for_sending_email,
+            'allowed_total_chars_for_text_translation': orm_entity.allowed_total_chars_for_text_translation,
+            'allowed_file_size_in_mb_for_file_translation': orm_entity.allowed_file_size_in_mb_for_file_translation,
         }
 
         return props

@@ -27,6 +27,9 @@ class SystemSettingOrmEntity(OrmEntityBase):
     email_for_sending_email = fields.EmailField(required=True)
     email_password_for_sending_email = fields.StringField(required=True)
     
+    allowed_total_chars_for_text_translation = fields.IntegerField(allow_none=False, default=5000)
+    allowed_file_size_in_mb_for_file_translation = fields.FloatField(allow_none=False, default=1.0)
+    
     class Meta:
         collection_name = database_config.COLLECTIONS['system_setting']['name']
 
