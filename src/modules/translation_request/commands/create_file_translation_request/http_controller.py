@@ -88,7 +88,7 @@ class CreateFileTranslationRequest(HTTPMethodView):
         file = request.files.get("file")
         data = request.form
         
-        if not self.is_allowed_file_size(size_of(file)): 
+        if not await self.is_allowed_file_size(size_of(file)): 
             return ArgumentOutOfRangeException(
                 message=MESSAGES['file_size_exceeded_allowed'],
                 metadata=dict(
