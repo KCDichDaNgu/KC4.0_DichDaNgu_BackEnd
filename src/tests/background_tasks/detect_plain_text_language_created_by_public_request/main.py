@@ -32,17 +32,17 @@ async def test_read_task_result():
     #Test 1:
     try :
         valid_tasks_mapper, invalid_tasks_mapper = await read_task_result([], [], [])
-        print("Test read_task_result in Test case 1: TRUE\n")
+        print("Test read_task_result in Test case 0: TRUE\n")
     except Exception as e:
         print(e)
-        print("Test read_task_result in Test case 1: FALSE\n")
+        print("Test read_task_result in Test case 0: FALSE\n")
     
     #Test 2:
     for i, item in df.iterrows():
         try :
             language_detect_request_entity = LanguageDetectionRequestEntity(
                 LanguageDetectionRequestProps(
-                    creator_id= ID(item['task_id']),
+                    creator_id= ID(None),
                     task_name= LanguageDetectionTaskNameEnum.public_plain_text_language_detection.value,
                     creator_type= CreatorTypeEnum.end_user.value,
                     step_status= StepStatusEnum.closed.value,
@@ -53,7 +53,7 @@ async def test_read_task_result():
 
             language_detect_request_result_entity = LanguageDetectionRequestResultEntity(
                 LanguageDetectionRequestResultProps(
-                    task_id= ID(item['task_id']),
+                    task_id= ID(None),
                     step= LanguageDetectionTaskStepEnum.detecting_language.value,
                     file_path= item['task_file_name']
                 )
@@ -62,11 +62,11 @@ async def test_read_task_result():
 
             language_detect_history_entity = LanguageDetectionHistoryEntity(
                 LanguageDetectionHistoryProps(
-                    creator_id= ID("76b76d60-2682-4c53-b092-c8262a353dba"),
-                    task_id= ID("76b76d60-2682-4c53-b092-c8262a353dba"),
+                    creator_id= ID(None),
+                    task_id= ID(item['task_id']),
                     language_detection_type= LanguageDetectionHistoryTypeEnum.public_plain_text_language_detection.value,
                     status= LanguageDetectionHistoryStatus.detecting.value,
-                    file_path= "1648110429829__76b76d60-2682-4c53-b092-c8262a353dba.json"
+                    file_path= item['task_file_name']
                 )
             )
             language_detection_history = [language_detect_history_entity]
@@ -92,17 +92,17 @@ async def test_mark_invalid_tasks():
     try :
         invalid_tasks_mapper = {}
         await mark_invalid_tasks(invalid_tasks_mapper)
-        print("Test mark_invalid_task in Test Case 1: TRUE\n")
+        print("Test mark_invalid_task in Test Case 0: TRUE\n")
     except Exception as e:
         print(e)
-        print("Test mark_invalid_task in Test Case 1: FALSE\n")
+        print("Test mark_invalid_task in Test Case 0: FALSE\n")
     
     #Test 2:
     for i, item in df.iterrows():
         try :
             language_detect_request_entity = LanguageDetectionRequestEntity(
                 LanguageDetectionRequestProps(
-                    creator_id= ID(item['task_id']),
+                    creator_id= ID(None),
                     task_name= LanguageDetectionTaskNameEnum.public_plain_text_language_detection.value,
                     creator_type= CreatorTypeEnum.end_user.value,
                     step_status= StepStatusEnum.closed.value,
@@ -122,11 +122,11 @@ async def test_mark_invalid_tasks():
 
             language_detect_history_entity = LanguageDetectionHistoryEntity(
                 LanguageDetectionHistoryProps(
-                    creator_id= ID("76b76d60-2682-4c53-b092-c8262a353dba"),
-                    task_id= ID("76b76d60-2682-4c53-b092-c8262a353dba"),
+                    creator_id= ID(None),
+                    task_id= ID(item['task_id']),
                     language_detection_type= LanguageDetectionHistoryTypeEnum.public_plain_text_language_detection.value,
                     status= LanguageDetectionHistoryStatus.detecting.value,
-                    file_path= "1648110429829__76b76d60-2682-4c53-b092-c8262a353dba.json"
+                    file_path= item['task_file_name']
                 )
             )
             language_detection_history = [language_detect_history_entity]
@@ -154,17 +154,17 @@ async def test_execute_in_batch():
             tasks_id= [],
             allowed_concurrent_request= ALLOWED_CONCURRENT_REQUEST
         )
-        print("Test excute_in_batch in Test case 1: TRUE\n")
+        print("Test excute_in_batch in Test case 0: TRUE\n")
     except Exception as e:
         print(e)
-        print("Test excute_in_batch in Test case 1: FALSE\n")
+        print("Test excute_in_batch in Test case 0: FALSE\n")
     
     #Test 2:
     for i, item in df.iterrows():
         try :
             language_detect_request_entity = LanguageDetectionRequestEntity(
                 LanguageDetectionRequestProps(
-                    creator_id= ID(item['task_id']),
+                    creator_id= ID(None),
                     task_name= LanguageDetectionTaskNameEnum.public_plain_text_language_detection.value,
                     creator_type= CreatorTypeEnum.end_user.value,
                     step_status= StepStatusEnum.closed.value,
@@ -184,11 +184,11 @@ async def test_execute_in_batch():
 
             language_detect_history_entity = LanguageDetectionHistoryEntity(
                 LanguageDetectionHistoryProps(
-                    creator_id= ID("76b76d60-2682-4c53-b092-c8262a353dba"),
-                    task_id= ID("76b76d60-2682-4c53-b092-c8262a353dba"),
+                    creator_id= ID(None),
+                    task_id= ID(item['task_id']),
                     language_detection_type= LanguageDetectionHistoryTypeEnum.public_plain_text_language_detection.value,
                     status= LanguageDetectionHistoryStatus.detecting.value,
-                    file_path= "1648110429829__76b76d60-2682-4c53-b092-c8262a353dba.json"
+                    file_path= item['task_file_name']
                 )
             )
             language_detection_history = [language_detect_history_entity]
@@ -225,9 +225,9 @@ async def test_main():
         print(e)
         print("Test main in Test case: FALSE\n")
 
-def test_all():
-    test_read_task_result()
-    test_mark_invalid_tasks()
-    test_execute_in_batch()
-    test_main()
+async def test_all():
+    await test_read_task_result()
+    await test_mark_invalid_tasks()
+    await test_execute_in_batch()
+    await test_main()
     
