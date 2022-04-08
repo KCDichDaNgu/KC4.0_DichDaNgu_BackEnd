@@ -11,7 +11,7 @@ from infrastructure.configs.task import TranslationTask_TranslationCompletedResu
 from infrastructure.configs.translation_history import TranslationHistoryStatus
 from infrastructure.configs.translation_task import RESULT_FILE_STATUS, AllowedFileTranslationExtensionEnum, FileTranslationTask_NotYetTranslatedResultFileSchemaV1, FileTranslationTask_TranslatingResultFileSchemaV1, FileTranslationTask_TranslationCompletedResultFileSchemaV1, get_file_translation_file_path, get_file_translation_target_file_name
 from inspect import trace
-from modules.background_tasks.translate_file_created_by_private_request.translate_content.txt.main import *
+from modules.background_tasks.translate_file_created_by_public_request.translate_content.txt.main import *
 from modules.system_setting.database.repository import SystemSettingRepository
 from modules.translation_request.database.translation_history.repository import TranslationHistoryRepository, TranslationHistoryEntity, TranslationHistoryProps
 from modules.translation_request.database.translation_request.repository import TranslationRequestRepository, TranslationRequestEntity, TranslationRequestProps
@@ -40,7 +40,7 @@ system_setting_repository = SystemSettingRepository()
 contentTranslator = ContentTranslator()
 
 logger = Logger(
-    'Task: translate_file_created_by_private_request.translate_content.txt'
+    'Task: translate_file_created_by_public_request.translate_content.txt'
 )
 
 
@@ -349,7 +349,7 @@ async def test_main():
 
 
 async def test_all():
-    print('Begin testing module translate_file_created_by_private_request.translate_content.txt')
+    print('Begin testing module translate_file_created_by_public_request.translate_content.txt')
     await test_read_task_result()
     await test_mark_invalid_tasks()
     await test_execute_in_batch()
