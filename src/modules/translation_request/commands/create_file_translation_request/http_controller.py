@@ -1,6 +1,7 @@
 from sanic.views import HTTPMethodView
 from sanic_openapi.openapi2 import doc
 from sanic import response
+from core.utils.common import size_of
 
 import io
 from infrastructure.configs.user import TRANSLATION_PAIR_VI_EN, TRANSLATION_PAIR_VI_ZH, TranslationPairEnum
@@ -13,7 +14,10 @@ from modules.translation_request.commands.create_file_translation_request.comman
 from infrastructure.configs.message import MESSAGES
 from infrastructure.configs.language import LanguageEnum
 from infrastructure.configs.translation_task import is_allowed_file_extension
+
 from core.exceptions.argument_invalid import ArgumentInvalidException
+from core.exceptions.argument_out_of_range import ArgumentOutOfRangeException
+
 from core.value_objects.id import ID
 from core.middlewares.authentication.core import active_required, get_me
 
@@ -27,9 +31,23 @@ class CreateFileTranslationRequest(HTTPMethodView):
 
         from modules.translation_request.commands.create_file_translation_request.service import CreateFileTranslationRequestService
         from modules.user.commands.update_user_statistic.service import UpdateUserStatisticService
+        from modules.system_setting.database.repository import SystemSettingRepository
         
         self.__create_file_translation_request_service = CreateFileTranslationRequestService()
         self.__update_user_statistic = UpdateUserStatisticService()
+        
+        self.__system_setting_repo = SystemSettingRepository()
+        
+    async def is_allowed_file_size(self, file_size):
+        
+        system_setting = await self.__system_setting_repo.find_one({})
+        
+        allowed_file_size_in_mb_for_file_translation = system_setting.props.allowed_file_size_in_mb_for_file_translation
+        
+        if file_size > allowed_file_size_in_mb_for_file_translation:
+            return False
+        
+        return True
         
     @doc.summary(APP_CONFIG.ROUTES['translation_request.doc_translation.create']['summary'])
     @doc.description(APP_CONFIG.ROUTES['translation_request.doc_translation.create']['desc'])
@@ -69,6 +87,15 @@ class CreateFileTranslationRequest(HTTPMethodView):
         user = await get_me(request)
         file = request.files.get("file")
         data = request.form
+        
+        if not await self.is_allowed_file_size(size_of(file, 'mb')): 
+            return ArgumentOutOfRangeException(
+                message=MESSAGES['file_size_exceeded_allowed'],
+                metadata=dict(
+                    code=StatusCodeEnum.failed.value,
+                    data={}
+                )
+            )
 
         if not is_allowed_file_extension(file.name):
             return ArgumentInvalidException(

@@ -1,5 +1,5 @@
 from typing import List
-
+import sys
 
 def first_elem(iterable, default = None, condition = lambda x: True):
 
@@ -28,3 +28,8 @@ def chunk_arr(input: List, size: int) -> List[List]:
 
     for i in range(0, len(input), size):
         yield input[i:i + size]
+        
+def size_of(object, unit='b'):
+    
+    if unit == 'b': return sys.getsizeof(object)
+    elif unit == 'mb': return sys.getsizeof(object) / 1024.0**2

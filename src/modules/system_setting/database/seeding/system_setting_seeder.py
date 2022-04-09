@@ -29,6 +29,8 @@ class SystemSettingSeeder(BaseSeeder):
                 'language_detection_speed': 0.05,
                 'email_for_sending_email': 'kcdichdangu.uet@gmail.com',
                 'email_password_for_sending_email': '',
+                'allowed_total_chars_for_text_translation': 5000,
+                'allowed_file_size_in_mb_for_file_translation': 1,
                 'created_at': datetime.now(),
                 'updated_at': datetime.now()
             },

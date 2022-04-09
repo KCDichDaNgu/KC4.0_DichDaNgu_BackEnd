@@ -6,6 +6,10 @@ from infrastructure.configs.message import MESSAGES
 from infrastructure.configs.main import StatusCodeEnum, GlobalConfig, get_cnf
 from interface_adapters.dtos.base_response import BaseResponse
 
+from infrastructure.configs.user import UserRole
+
+from core.middlewares.authentication.core import login_required
+
 from sanic_openapi import doc
 from sanic.views import HTTPMethodView
 
@@ -28,6 +32,7 @@ class UpdateSystemSetting(HTTPMethodView):
     @doc.description(APP_CONFIG.ROUTES['system_setting.update']['desc'])
     @doc.consumes(Body, location="body")
     @doc.produces(SystemSettingResponse)
+    @login_required(roles=[UserRole.admin.value])
     async def put(self, request):
 
         data = request.json['data']
@@ -42,6 +47,8 @@ class UpdateSystemSetting(HTTPMethodView):
             language_detection_speed=float(data['languageDetectionSpeed']),
             email_for_sending_email=data['emailForSendingEmail'],
             email_password_for_sending_email=data['emailPasswordForSendingEmail'],
+            allowed_total_chars_for_text_translation=data['allowedTotalCharsForTextTranslation'],
+            allowed_file_size_in_mb_for_file_translation=data['allowedFileSizeInMbForFileTranslation'],
         )
 
         saved_setting = await self.__system_setting_service.update(command)
@@ -58,6 +65,8 @@ class UpdateSystemSetting(HTTPMethodView):
                 'languageDetectionSpeed': saved_setting.props.language_detection_speed,
                 'emailForSendingEmail': saved_setting.props.email_for_sending_email,
                 'emailPasswordForSendingEmail': saved_setting.props.email_password_for_sending_email,
+                'allowedTotalCharsForTextTranslation': saved_setting.props.allowed_total_chars_for_text_translation,
+                'allowedFileSizeInMbForFileTranslation': saved_setting.props.allowed_file_size_in_mb_for_file_translation,
             },
             'message': MESSAGES['success']
         }).dict())

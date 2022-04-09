@@ -36,6 +36,8 @@ class GetSystemSetting(HTTPMethodView):
                 'languageDetectionSpeed': saved_setting.props.language_detection_speed,
                 'emailForSendingEmail': saved_setting.props.email_for_sending_email,
                 'emailPasswordForSendingEmail': saved_setting.props.email_password_for_sending_email,
+                'allowedTotalCharsForTextTranslation': saved_setting.props.allowed_total_chars_for_text_translation,
+                'allowedFileSizeInMbForFileTranslation': saved_setting.props.allowed_file_size_in_mb_for_file_translation,
             },
             'message': MESSAGES['success']
         }).dict())

@@ -13,3 +13,5 @@ class UpdateSystemSettingCommand(BaseModel):
     language_detection_speed: float
     email_for_sending_email: str
     email_password_for_sending_email: str
+    allowed_total_chars_for_text_translation: int
+    allowed_file_size_in_mb_for_file_translation: float

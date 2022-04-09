@@ -22,6 +22,8 @@ class SystemSettingProps(BaseModel):
     language_detection_speed: float = Field(...)
     email_for_sending_email: str = Field(...)
     email_password_for_sending_email: str = Field(...)
+    allowed_total_chars_for_text_translation: int = Field(...)
+    allowed_file_size_in_mb_for_file_translation: float = Field(...)
 
     class Config:
         use_enum_values = True
