@@ -51,6 +51,8 @@ async def read_task_result(
     
     valid_tasks_mapper = {}
 
+    print (tasks)
+
     task_id_1 = list(map(lambda t: t.id.value, tasks))
     task_id_2 = list(map(lambda ts: ts.props.task_id.value, tasks_result))
     task_id_3 = list(map(lambda th: th.props.task_id.value, language_detections_history))

@@ -265,19 +265,19 @@ class AppConfig(BaseModel):
             TRIGGER=BackgroundTaskTriggerEnum.interval.value,
             CONFIG=dict(seconds=0, max_instances=1),
         ),
-        
+
         "delete_invalid_task": BackgroundTask(
             ID="delete_invalid_task",
             TRIGGER=BackgroundTaskTriggerEnum.interval.value,
             CONFIG=dict(seconds=0, max_instances=1),
         ),
-        
-         "send_translation_email": BackgroundTask(
+
+        "send_translation_email": BackgroundTask(
             ID="send_translation_email",
             TRIGGER=BackgroundTaskTriggerEnum.interval.value,
             CONFIG=dict(seconds=0, max_instances=1),
         ),
-        
+
 
         "detect_plain_text_language_created_by_public_request": BackgroundTask(
             ID="detect_plain_text_language_created_by_public_request",
@@ -289,8 +289,8 @@ class AppConfig(BaseModel):
             TRIGGER=BackgroundTaskTriggerEnum.interval.value,
             CONFIG=dict(seconds=0, max_instances=1),
         ),
-        
-        
+
+
         "detect_plain_text_language_created_by_private_request": BackgroundTask(
             ID="detect_plain_text_language_created_by_private_request",
             TRIGGER=BackgroundTaskTriggerEnum.interval.value,
@@ -301,8 +301,8 @@ class AppConfig(BaseModel):
             TRIGGER=BackgroundTaskTriggerEnum.interval.value,
             CONFIG=dict(seconds=0, max_instances=1),
         ),
-        
-        
+
+
         "translate_file_created_by_private_request.detect_content_language": BackgroundTask(
             ID="translate_file_created_by_private_request.detect_content_language",
             TRIGGER=BackgroundTaskTriggerEnum.interval.value,
@@ -328,9 +328,9 @@ class AppConfig(BaseModel):
             TRIGGER=BackgroundTaskTriggerEnum.interval.value,
             CONFIG=dict(seconds=0, max_instances=1),
         ),
-        
-        
-        
+
+
+
         "translate_file_created_by_public_request.detect_content_language": BackgroundTask(
             ID="translate_file_created_by_public_request.detect_content_language",
             TRIGGER=BackgroundTaskTriggerEnum.interval.value,
@@ -356,9 +356,9 @@ class AppConfig(BaseModel):
             TRIGGER=BackgroundTaskTriggerEnum.interval.value,
             CONFIG=dict(seconds=0, max_instances=1),
         ),
-        
-        
-        
+
+
+
         "translate_plain_text_created_by_private_request.detect_content_language": BackgroundTask(
             ID="translate_plain_text_created_by_private_request.detect_content_language",
             TRIGGER=BackgroundTaskTriggerEnum.interval.value,
@@ -369,9 +369,9 @@ class AppConfig(BaseModel):
             TRIGGER=BackgroundTaskTriggerEnum.interval.value,
             CONFIG=dict(seconds=0, max_instances=1),
         ),
-        
-        
-        
+
+
+
         "translate_plain_text_created_by_public_request.detect_content_language": BackgroundTask(
             ID="translate_plain_text_created_by_public_request.detect_content_language",
             TRIGGER=BackgroundTaskTriggerEnum.interval.value,
@@ -413,7 +413,7 @@ class AppConfig(BaseModel):
             TRIGGER=BackgroundTaskTriggerEnum.interval.value,
             CONFIG=dict(seconds=5, max_instances=1),
         ),
-        
+
         "test_translate_plain_text_created_by_private_request.translate_content.mark_invalid_tasks": BackgroundTask(
             ID="test_translate_plain_text_created_by_private_request.translate_content.mark_invalid_tasks",
             TRIGGER=BackgroundTaskTriggerEnum.interval.value,
@@ -430,7 +430,7 @@ class AppConfig(BaseModel):
             TRIGGER=BackgroundTaskTriggerEnum.interval.value,
             CONFIG=dict(seconds=5, max_instances=1),
         ),
-         "test_send_transaction_email": BackgroundTask(
+        "test_send_transaction_email": BackgroundTask(
             ID="test_send_transactino_email",
             TRIGGER=BackgroundTaskTriggerEnum.interval.value,
             CONFIG=dict(seconds=0, max_instances=1),
@@ -450,6 +450,11 @@ class AppConfig(BaseModel):
             TRIGGER=BackgroundTaskTriggerEnum.interval.value,
             CONFIG=dict(seconds=0, max_instances=1),
         ),
+         "test_translate_file_created_by_public_request.translate_content.pptx": BackgroundTask(
+            ID="test_translate_file_created_by_public_request.translate_content.pptx",
+            TRIGGER=BackgroundTaskTriggerEnum.interval.value,
+            CONFIG=dict(seconds=0, max_instances=1)
+        ),
 
         "test_send_email_result_for_text_translation": BackgroundTask(
             ID="test_send_email_result_for_text_translation",
@@ -465,9 +470,31 @@ class AppConfig(BaseModel):
             ID="test_send_translation_email_main",
             TRIGGER=BackgroundTaskTriggerEnum.interval.value,
             CONFIG=dict(seconds=0, max_instances=1),
+        ),
+        "test_translate_plain_text_created_by_public_request.translate_content.main": BackgroundTask(
+            ID="test_translate_plain_text_created_by_public_request.translate_content.main",
+            TRIGGER=BackgroundTaskTriggerEnum.interval.value,
+            CONFIG=dict(seconds=5, max_instances=1),
+        ),
+        "test_translate_plain_text_created_by_public_request.translate_content.read_task_result": BackgroundTask(
+            ID="test_translate_plain_text_created_by_public_request.translate_content.read_task_result",
+            TRIGGER=BackgroundTaskTriggerEnum.interval.value,
+            CONFIG=dict(seconds=5, max_instances=1),
+        ),
+
+        "test_translate_plain_text_created_by_public_request.translate_content.execute_in_batch": BackgroundTask(
+            ID="test_translate_plain_text_created_by_public_request.translate_content.execute_in_batch",
+            TRIGGER=BackgroundTaskTriggerEnum.interval.value,
+            CONFIG=dict(seconds=5, max_instances=1),
+        ),
+
+        "test_translate_plain_text_created_by_public_request.translate_content.mark_invalid_tasks": BackgroundTask(
+            ID="test_translate_plain_text_created_by_public_request.translate_content.mark_invalid_tasks",
+            TRIGGER=BackgroundTaskTriggerEnum.interval.value,
+            CONFIG=dict(seconds=5, max_instances=1),
         )
-    }   
-    
+    }
+
     MAX_QUERY_SIZE = 10
 
 
@@ -483,6 +510,7 @@ class LanguageDetectionAPI(BaseModel):
     URL: AnyHttpUrl = Field(...)
     METHOD: str = Field(...)
     ALLOWED_CONCURRENT_REQUEST: int = Field(...)
+
 
 class Pagination(BaseModel):
 
@@ -522,7 +550,8 @@ class GlobalConfig(BaseSettings):
     APP_LIFESPAN: str = None
     SERVER_TYPE: str = None
 
-    CQLENG_ALLOW_SCHEMA_MANAGEMENT: Any = Field(env="CQLENG_ALLOW_SCHEMA_MANAGEMENT")
+    CQLENG_ALLOW_SCHEMA_MANAGEMENT: Any = Field(
+        env="CQLENG_ALLOW_SCHEMA_MANAGEMENT")
 
     CASSANDRA_DATABASE: CassandraDatabase
     MONGODB_DATABASE: MongoDBDatabase
