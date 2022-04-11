@@ -455,7 +455,21 @@ class AppConfig(BaseModel):
             TRIGGER=BackgroundTaskTriggerEnum.interval.value,
             CONFIG=dict(seconds=0, max_instances=1)
         ),
-
+        "detect_file_language_created_by_private_request.test_all": BackgroundTask(
+            ID="detect_file_language_created_by_private_request.test_all",
+            TRIGGER=BackgroundTaskTriggerEnum.interval.value,
+            CONFIG=dict(seconds=0, max_instances=1)
+        ),
+        "detect_file_language_created_by_public_request.test_all": BackgroundTask(
+            ID="detect_file_language_created_by_public_request.test_all",
+            TRIGGER=BackgroundTaskTriggerEnum.interval.value,
+            CONFIG=dict(seconds=0, max_instances=1)
+        ),
+        "detect_file_language_created_by_public_request.test_all": BackgroundTask(
+            ID="detect_file_language_created_by_public_request.test_all",
+            TRIGGER=BackgroundTaskTriggerEnum.interval.value,
+            CONFIG=dict(seconds=0, max_instances=1)
+        ),
         "test_send_email_result_for_text_translation": BackgroundTask(
             ID="test_send_email_result_for_text_translation",
             TRIGGER=BackgroundTaskTriggerEnum.interval.value,
