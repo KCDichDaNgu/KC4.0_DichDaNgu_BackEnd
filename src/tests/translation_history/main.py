@@ -17,7 +17,8 @@ class TestLanguageDetectRequest(unittest.TestCase):
         self.assertEqual(self.response2.status_code, 200)
 
     def test_negative_get_translation_history(self):
-        non_existing_id = "translation-history/get-single?translationHistoryId=aa54200c-c559-4bb4-9952-a1126ce36e13&taskId=86ea0dd7-b52d-4392-a7f9-e32fbacf2c75"
+        id = "translation-history/get-single?translationHistoryId=aa54200c-c559-4bb4-9952-a1126ce36e13&taskId=86ea0dd7-b52d-4392-a7f9-e32fbacf2c75"
+        non_existing_id = id
         self.response = requests.get(self.baseURL.format(non_existing_id))
         body = self.response.json()
         # print(body['data'])

@@ -39,7 +39,7 @@ system_setting_repository = SystemSettingRepository()
 contentTranslator = ContentTranslator()
 
 logger = Logger(
-    'Task: translate_file_created_by_private_request.translate_content.docx'
+    'Task: translate_file_created_by_pulbic_request.translate_content.docx'
 )
 
 

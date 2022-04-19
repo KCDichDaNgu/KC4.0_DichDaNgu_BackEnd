@@ -35,7 +35,7 @@ async def test_main_delete_invalid_task():
 
 async def test_all():
     test_get_task_id_from_task_result_file_path_delete_invalid_task()
-    # test_get_to_be_deleted_file_path_delete_invalid_task()
-    # test_main_delete_invalid_task()
+    test_get_to_be_deleted_file_path_delete_invalid_task()
+    test_main_delete_invalid_task()
 
 

@@ -41,6 +41,7 @@ translation_request_result_repository = TranslationRequestResultRepository()
 translation_history_repository = TranslationHistoryRepository()
 system_setting_repository = SystemSettingRepository()
 
+print ("Test translate_plain_text_created_by_private_request")
 
 async def test_read_task_result():
 

@@ -238,7 +238,7 @@ async def test_execute_in_batch():
     print('=====================test_execute_in_batch=====================')
     seed = 1000
     random.seed(seed)
-    pnt(f'Random seed is {seed}')
+    print(f'Random seed is {seed}')
 
     try:
         tasks: List[TranslationRequestEntity]

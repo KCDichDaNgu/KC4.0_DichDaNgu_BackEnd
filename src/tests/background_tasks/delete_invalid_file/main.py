@@ -48,5 +48,5 @@ async def test_main():
 
 async def test_all():
     test_get_task_id_from_task_result_file_path()
-    #test_get_file_created_time()
-    # test_get_to_be_deleted_file_path()
+    test_get_file_created_time()
+    test_get_to_be_deleted_file_path()
