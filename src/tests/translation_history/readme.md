@@ -1,0 +1,2 @@
+- mở front-end và tạo một số yêu cầu dịch
+- đối với testcase test_negative_get_translation_history ta sẽ vào database sau đó vào xem bảng translation_history ta chọn một id của một history sau đó sửa cho id đó sai và thay vào biến id
