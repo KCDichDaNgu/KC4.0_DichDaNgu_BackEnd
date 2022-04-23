@@ -1,0 +1,6 @@
+Cases,Results
+([]),"([], [], [])"
+"[""filepath1.txt""]","([""task_result/filepath1.txt""], [""file_translation/filepath1/"", ""file_language_detection/filepath1/""])"
+"[""/doc/file.txt"", ""/usr/bin/go""]","([""task_result/file.txt"", ""task_result/usr/bin/go/""], [""file_translation/doc/file/"", ""file_translation/usr/bin/go/""], [""file_language_detection/doc/file/"", ""file_language_detection/usr/bin/go/""])"
+"[""a""]","([""task_result/a""], [""file_translation/a/""], [""file_language_detection/a/""])"
+"[""/usr/bin/go__what.txt""]","([""task_result/usr/bin/go__what.txt""], [""file_translation/what/""], [""file_language_detection/what/""])"
