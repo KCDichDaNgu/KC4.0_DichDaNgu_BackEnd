@@ -31,12 +31,11 @@ def test_get_file_created_time():
     
 def test_get_to_be_deleted_file_path():
     print("========== DELETE INVALID FILE TEST GET TO BE DELETED FILE PATH ==========")
-    print("Test_get_to_be_deleted_file_path test case 0: ", get_to_be_deleted_file_path([]) == ([], [], []))
-    print("Test_get_to_be_deleted_file_path test case 1: ",get_to_be_deleted_file_path(["filepath1.txt"]) == (["task_result/filepath1.txt"], ["file_translation/filepath1/", "file_language_detection/filepath1/"]))
-    print("Test_get_to_be_deleted_file_path test case 2: ", get_to_be_deleted_file_path(["/doc/file.txt", "/usr/bin/go"]) == (["task_result/file.txt", "task_result/usr/bin/go/"], ["file_translation/doc/file/", "file_translation/usr/bin/go/"], ["file_language_detection/doc/file/", "file_language_detection/usr/bin/go/"]))
-    print("Test_get_to_be_deleted_file_path test case 3: ", get_to_be_deleted_file_path(["a"]) == (["task_result/a"], ["file_translation/a/"], ["file_language_detection/a/"]))
-    print("Test_get_to_be_deleted_file_path test case 4: ", get_to_be_deleted_file_path(["/usr/bin/go__what.txt"]) == (["task_result/usr/bin/go__what.txt"], ["file_translation/what/"], ["file_language_detection/what/"]))
-    
+    df = pandas.read_csv('src/tests/background_tasks/delete_invalid_file/sample_data/data.csv')
+    for i, item in df.iterrows():
+        result = str(get_to_be_deleted_file_path(item['Cases']))
+        print(f'Test_get_to_be_deleted_file_path in test case {i}: ', item['Results']==result)
+
 
 async def test_main():
     print('========== DELETE INVALID FILE TEST MAIN ==========')
