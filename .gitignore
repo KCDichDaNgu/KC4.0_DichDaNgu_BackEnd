@@ -15,4 +15,3 @@ static/*
 static/task_result/
 static/speech_recognition/*
 .env
-node_modules
