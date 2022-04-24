@@ -1,3 +1,4 @@
+from ast import If
 import requests
 import unittest
 
@@ -18,8 +19,8 @@ def detect_lang(URL, payload):
     if response.status_code != 200:
         try:
             response.raise_for_status()
-        except requests.HTTPError as exception:
-            return None, response.status_code, exception
+        except requests.HTTPError:
+            return None, response.status_code
     data = response.json()
     return data['data']['taskName'], response.status_code
 
@@ -29,8 +30,8 @@ def translate(URL, payload):
     if response.status_code != 200:
         try:
             response.raise_for_status()
-        except requests.HTTPError as exception:
-            return None, response.status_code, exception
+        except requests.HTTPError:
+            return None, response.status_code
     data = response.json()
     return data['data']['taskName'], response.status_code
 
@@ -42,11 +43,11 @@ class test_detect_lang(unittest.TestCase):
         self.path = "detect-lang"
         self.baseURL = "http://localhost:8001/detect-lang"
 
-
     def test_status_code(self):
         task_name, status_code = detect_lang(
             url_gen(self.path), {'sourceText': 'Hello'})
-        self.assertEqual(status_code, 200, 'Status code of endpoint detect-lang failed')
+        self.assertEqual(status_code, 200,
+                         'Status code of endpoint detect-lang failed')
 
     def test_task_name(self):
         task_name, status_code = detect_lang(
@@ -54,8 +55,19 @@ class test_detect_lang(unittest.TestCase):
         self.assertEqual(
             task_name, 'public_plain_text_language_detection', 'Detect task name of endpoint detect-lang failed')
 
+    def test_validate_payload(self):
+        task_name, status_code = detect_lang(
+            url_gen(self.path), {"sourceText": [1, 2, 3, 4]})
+        self.assertEqual(
+            status_code, 500, 'Error in request')
 
-class test_translate(unittest.TestCase):    
+    def test_payload_type(self):
+        task_name, status_code = detect_lang(
+            url_gen(self.path), [1, 2, 3, 4])
+        self.assertEqual(status_code,  500, 'Error in payload type')
+
+
+class test_translate(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(test_translate, self).__init__(*args, **kwargs)
 
@@ -65,13 +77,24 @@ class test_translate(unittest.TestCase):
     def test_status_code(self):
         task_name, status_code = translate(url_gen(
             self.path), {"sourceText": "Hello", "targetLang": "vi", "sourceLang": "en"})
-        self.assertEqual(status_code, 200, 'Status code of endpoint translate failed')
+        self.assertEqual(status_code, 200,
+                         'Status code of endpoint translate failed')
 
     def test_task_name(self):
         task_name, status_code = translate(url_gen(
             self.path), {"sourceText": "Hello", "targetLang": "vi", "sourceLang": "en"})
         self.assertEqual(task_name, 'public_plain_text_translation',
                          'Detect task name of endpoint tranlate faied')
+
+    def test_validate_payload(self):
+        task_name, status_code = translate(url_gen(
+            self.path), {"sourceText": 1234, "targetLang": "abc", "sourceLang": 1})
+        self.assertEqual(status_code, 500, 'Error in request')
+
+    def test_payload_type(self):
+        task_name, status_code = translate(url_gen(
+            self.path), [1, 2, 3, 4])
+        self.assertEqual(status_code,  500, 'Error in payload type')
 
 
 if __name__ == "__main__":
