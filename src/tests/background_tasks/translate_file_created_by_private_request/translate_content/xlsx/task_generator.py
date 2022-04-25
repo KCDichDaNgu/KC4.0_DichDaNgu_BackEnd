@@ -9,7 +9,6 @@ MAX_RETRIES = 5
 
 # Create a new detection task by making request to backend
 
-
 def create_detection_task(file_path: str):
     # Read file
     files = {'file': open(file_path, 'r')}
@@ -131,4 +130,4 @@ def generate_tasks(test_dir: str):
 
 
 if __name__ == "__main__":
-    generate_tasks('../test_files') 
+    generate_tasks('./test_cases')
