@@ -1,0 +1,5 @@
+id,creator_id,creator_type,task_name,step_status,current_step,create_at,update_at,_cls,task_id,step,file_path
+ac7394b0-d6cc-4b23-8978-fa8a4d49d47d,null,end_user,public_plain_text_translation,completed,translating_language,2022-04-15T10:36:43.121Z,2022-04-15T19:48:24.771Z,TranslationRequestOrmEntity,null,null,null
+c3f70413-9414-4d70-b678-386adf27af4f,e99a4a57-99ef-419c-a271-9241b894874e,end_user,private_plain_text_translation,completed,translating_language,2022-04-15T10:54:20.328Z,2022-04-15T19:48:25.519Z,TranslationRequestOrmEntity,null,null,null
+b13e73d7-4395-493e-98c1-146b6507f092,null,null,null,null,null,2022-04-15T10:36:43.295Z,2022-04-15T10:36:43.295Z,TranslationRequestResultOrmEntity,ac7394b0-d6cc-4b23-8978-fa8a4d49d47d,translating_language,1649993803110__ac7394b0-d6cc-4b23-8978-fa8a4d49d47d.json
+525b4ec9-1e27-4f9c-81ae-49557e401af1,null,null,null,null,null,2022-04-15T10:54:20.330Z,2022-04-15T10:54:20.330Z,TranslationRequestResultOrmEntity,c3f70413-9414-4d70-b678-386adf27af4f,translating_language,1649994860325__c3f70413-9414-4d70-b678-386adf27af4f.json
