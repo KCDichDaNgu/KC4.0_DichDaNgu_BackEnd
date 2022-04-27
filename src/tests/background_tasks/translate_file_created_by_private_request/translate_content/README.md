@@ -1,4 +1,4 @@
-# Module kiểm thử nhóm 7
+# Module kiểm thử `translate_file_created_by_private_request`
 Mục đích:kiểm thử các function ,đảm bảo dịch các tệp được tạo theo private request
 Trong backend/src/infrastructure/configs/main.py thêm cấu hình cho các background tasks mới
         

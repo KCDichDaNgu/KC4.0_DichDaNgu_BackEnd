@@ -153,7 +153,6 @@ async def test_all():
     system_setting = await system_setting_repository.find_one({})
     ALLOWED_CONCURRENT_REQUEST = system_setting.props.language_detection_api_allowed_concurrent_req
 
-    # await test_read_task_result()
-    # await test_mark_invalid_tasks()
+    await test_read_task_result()
+    await test_mark_invalid_tasks()
     await test_execute_in_batch(ALLOWED_CONCURRENT_REQUEST)
-    # await test_main()

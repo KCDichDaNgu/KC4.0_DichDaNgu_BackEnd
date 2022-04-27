@@ -1,16 +1,8 @@
-from datetime import datetime
-import io
 import json
-from os import urandom
-import pickle
-import random
 import traceback
-from backend.src.infrastructure.adapters.logger.main import Logger
-from backend.src.modules.background_tasks.translate_file_created_by_private_request.translate_content.xlsx.main import mark_invalid_tasks
-from backend.src.modules.background_tasks.translate_file_created_by_private_request.translate_content.xlsx.main import read_task_result
-from backend.src.modules.background_tasks.translate_file_created_by_private_request.translate_content.xlsx.main import execute_in_batch
-from backend.src.modules.background_tasks.translate_file_created_by_private_request.translate_content.xlsx.main import main
-from backend.src.tests.background_tasks.translate_file_created_by_private_request.translate_content.xlsx.main import test_read_task_result
+from infrastructure.adapters.logger.main import Logger
+from modules.background_tasks.translate_file_created_by_private_request.translate_content.xlsx.main import mark_invalid_tasks, read_task_result, execute_in_batch, main
+from modules.background_tasks.translate_file_created_by_private_request.translate_content.xlsx.main import read_task_result
 from infrastructure.configs.language import LanguageEnum
 from infrastructure.configs.translation_history import TranslationHistoryStatus
 from core.utils.common import chunk_arr
@@ -19,11 +11,8 @@ from typing import List
 from uuid import UUID
 from infrastructure.configs.main import GlobalConfig, get_cnf, get_mongodb_instance
 from infrastructure.configs.task import (
-    TranslationTask_TranslationCompletedResultFileSchemaV1, 
-    TranslationTask_NotYetTranslatedResultFileSchemaV1, 
     TranslationTaskNameEnum, 
-    TranslationTaskStepEnum, 
-    StepStatusEnum
+    TranslationTaskStepEnum
 )
 
 from infrastructure.adapters.content_translator.main import ContentTranslator 
@@ -34,7 +23,6 @@ from modules.translation_request.database.translation_history.repository import 
 from modules.system_setting.database.repository import SystemSettingRepository
 
 import asyncio
-import unittest
 
 config: GlobalConfig = get_cnf()
 db_instance = get_mongodb_instance()
@@ -180,7 +168,7 @@ async def test_execute_in_batch():
                             step=TranslationTaskStepEnum.translating_language.value
                         )
                     ),
-                    translation_history_repository.find_many(
+                    transation_history_repository.find_many(
                         params=dict(
                             task_id={
                                 '$in': list(map(lambda t: UUID(t), [task_id]))
@@ -255,7 +243,6 @@ async def test_main():
 
 
 async def test_all():
-    await test_read_task_result()
     await test_mark_invalid_tasks()
     await test_execute_in_batch()
     await test_main()

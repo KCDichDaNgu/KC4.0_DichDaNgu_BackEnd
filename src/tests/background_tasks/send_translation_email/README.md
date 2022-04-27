@@ -1,4 +1,4 @@
-# Module kiểm thử nhóm 13
+# Module kiểm thử `send_translation_email`
 
 ## Chuẩn bị cho kiểm thử các hàm
 Để chuẩn bị cho kiểm thử:
@@ -14,11 +14,6 @@
             ID="test_send_email_result_for_file_translation",
             TRIGGER=BackgroundTaskTriggerEnum.interval.value,
             CONFIG=dict(seconds=0, max_instances=1),
-        ),
-        "test_send_translation_email_main": BackgroundTask(
-            ID="test_send_translation_email_main",
-            TRIGGER=BackgroundTaskTriggerEnum.interval.value,
-            CONFIG=dict(seconds=0, max_instances=1),
         )
 ```
 ~2. Trong /backend/src/tests/background_tasks/main.py, thêm các lệnh import ứng với các hàm muốn kiểm thử.
@@ -27,9 +22,8 @@
 from tests.background_tasks.send_translation_email import <x> as <name>
 ```
 Trong đó, x là:
-- **add_fresh_jobs** nếu kiểm thử hàm **send_email_result_for_text_translation**
+- **add_fresh_jobs_1** nếu kiểm thử hàm **send_email_result_for_text_translation**
 - **add_fresh_jobs_2** nếu kiểm thử hàm **send_email_result_for_file_translation**
-- **add_fresh_jobs_3** nếu kiểm thử hàm **main**
 
 Sau đó, thêm dòng lệnh sau vào cuối file 
 

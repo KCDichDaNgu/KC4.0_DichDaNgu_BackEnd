@@ -1,16 +1,10 @@
 from core.utils.common import chunk_arr
-from core.utils.document import check_if_paragraph_has_text, get_common_style
-from core.utils.file import get_doc_paragraphs, get_full_path
-from datetime import datetime
-from docx import Document
 from infrastructure.adapters.content_translator.main import ContentTranslator
 from infrastructure.adapters.logger import Logger
 from infrastructure.configs.language import LanguageEnum
 from infrastructure.configs.main import GlobalConfig, get_cnf, get_mongodb_instance
-from infrastructure.configs.task import TranslationTask_TranslationCompletedResultFileSchemaV1, TranslationTask_NotYetTranslatedResultFileSchemaV1, TranslationTaskNameEnum, TranslationTaskStepEnum, StepStatusEnum
+from infrastructure.configs.task import TranslationTaskNameEnum, TranslationTaskStepEnum
 from infrastructure.configs.translation_history import TranslationHistoryStatus
-from infrastructure.configs.translation_task import RESULT_FILE_STATUS, AllowedFileTranslationExtensionEnum, FileTranslationTask_NotYetTranslatedResultFileSchemaV1, FileTranslationTask_TranslatingResultFileSchemaV1, FileTranslationTask_TranslationCompletedResultFileSchemaV1, get_file_translation_file_path, get_file_translation_target_file_name
-from inspect import trace
 from modules.background_tasks.translate_file_created_by_private_request.translate_content.docx.main import *
 from modules.system_setting.database.repository import SystemSettingRepository
 from modules.translation_request.database.translation_history.repository import TranslationHistoryRepository, TranslationHistoryEntity, TranslationHistoryProps
@@ -18,11 +12,8 @@ from modules.translation_request.database.translation_request.repository import 
 from modules.translation_request.database.translation_request_result.repository import TranslationRequestResultRepository, TranslationRequestResultEntity, TranslationRequestResultProps
 from typing import List
 from uuid import UUID
-import aiohttp
 import asyncio
-import io
 import json
-import pymongo
 import random
 import traceback
 

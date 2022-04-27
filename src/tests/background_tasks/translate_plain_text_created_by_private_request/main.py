@@ -280,3 +280,9 @@ async def test_main():
     except Exception as e:
         print(e)
         print('Test translate_plain_text_created_by_private_request FALSE')
+
+async def test_all():
+    await test_read_task_result()
+    await test_mark_invalid_tasks()
+    await test_execute_in_batch()
+    await test_main()
