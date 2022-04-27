@@ -3,7 +3,6 @@ import pandas
 from core.value_objects.id import ID
 from infrastructure.configs.task import (
     LanguageDetectionTask_LangUnknownResultFileSchemaV1, 
-    LanguageDetectionTask_LanguageDetectionCompletedResultFileSchemaV1,
     LanguageDetectionTaskNameEnum, 
     CreatorTypeEnum,
     LanguageDetectionTaskStepEnum, 

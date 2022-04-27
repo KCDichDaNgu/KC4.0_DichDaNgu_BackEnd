@@ -41,6 +41,8 @@ translation_request_result_repository = TranslationRequestResultRepository()
 translation_history_repository = TranslationHistoryRepository()
 system_setting_repository = SystemSettingRepository()
 
+print ("Test translate_plain_text_created_by_private_request")
+
 
 async def test_read_task_result():
 
@@ -277,3 +279,9 @@ async def test_main():
     except Exception as e:
         print(e)
         print('Test translate_plain_text_created_by_public_request FALSE')
+
+async def test_all():
+    await test_read_task_result()
+    await test_mark_invalid_tasks()
+    await test_execute_in_batch()
+    await test_main()

@@ -1,8 +1,4 @@
 from core.utils.common import chunk_arr
-from core.utils.document import check_if_paragraph_has_text, get_common_style
-from core.utils.file import get_doc_paragraphs, get_full_path
-from datetime import datetime
-from docx import Document
 from infrastructure.adapters.content_translator.main import ContentTranslator
 from infrastructure.adapters.logger import Logger
 from infrastructure.configs.language import LanguageEnum

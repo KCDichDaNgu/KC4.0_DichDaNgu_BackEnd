@@ -1,1 +1,2 @@
 - Để chạy test ta cần xoá tất cả các job ở file main.py trong folder tests và chỉ để lại job 8
+- Tạo yêu cầu dịch trên front-end
