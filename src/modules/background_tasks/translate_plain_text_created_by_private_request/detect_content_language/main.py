@@ -10,7 +10,7 @@ from core.utils.common import chunk_arr
 from typing import List
 from uuid import UUID
 
-from infrastructure.configs.main import GlobalConfig, get_cnf, get_mongodb_instance
+from infrastructure.configs.main import GlobalConfig, get_cnf, get_mongodb_instance, MAX_RETRIES
 from infrastructure.configs.task import (
     TranslationTask_LangUnknownResultFileSchemaV1, 
     TranslationTask_NotYetTranslatedResultFileSchemaV1, 
@@ -25,6 +25,8 @@ from modules.translation_request.database.translation_request.repository import 
 from modules.translation_request.database.translation_request_result.repository import TranslationRequestResultRepository, TranslationRequestResultEntity
 from modules.translation_request.database.translation_history.repository import TranslationHistoryRepository, TranslationHistoryEntity
 from modules.system_setting.database.repository import SystemSettingRepository
+
+from core.utils.common import get_exception_log
 
 import asyncio
 import aiohttp
@@ -150,17 +152,18 @@ async def mark_invalid_tasks(invalid_tasks_mapper):
 
 async def main():
     
-    system_setting = await system_setting_repository.find_one({})
-    
-    ALLOWED_CONCURRENT_REQUEST = system_setting.props.language_detection_api_allowed_concurrent_req
-
-    logger.debug(
-        msg=f'New task translate_plain_text_in_private_request.detect_content_language run in {datetime.now()}'
-    )
-
-    print(f'New task translate_plain_text_in_private_request.detect_content_language run in {datetime.now()}')
-    
     try:
+    
+        system_setting = await system_setting_repository.find_one({})
+        
+        ALLOWED_CONCURRENT_REQUEST = system_setting.props.language_detection_api_allowed_concurrent_req
+
+        logger.debug(
+            msg=f'New task translate_plain_text_in_private_request.detect_content_language run in {datetime.now()}'
+        )
+
+        print(f'New task translate_plain_text_in_private_request.detect_content_language run in {datetime.now()}')
+    
         
         tasks = await translation_request_repository.find_many(
             params=dict(
@@ -217,18 +220,41 @@ async def main():
         chunked_tasks_id = list(chunk_arr(valid_tasks_id, ALLOWED_CONCURRENT_REQUEST))
 
         for chunk in chunked_tasks_id:
-
-            try:
             
-                await execute_in_batch(valid_tasks_mapper, chunk, ALLOWED_CONCURRENT_REQUEST)
-
-            except Exception as e:
-                logger.error(e)
-                
-                print(e)
+            await execute_in_batch(valid_tasks_mapper, chunk, ALLOWED_CONCURRENT_REQUEST)
 
     except Exception as e:
-        logger.error(e)
+        
+        error_message = get_exception_log(e)
+        
+        async with db_instance.session() as session:
+            async with session.start_transaction():
+        
+                for task in tasks:
+                    
+                    retry = task.props.retry + 1
+                    
+                    changes = dict(
+                        retry=retry,
+                        error_message=error_message
+                    )
+                    
+                    if retry > MAX_RETRIES: 
+                        changes = dict(
+                            step_status=StepStatusEnum.cancelled.value
+                        )
+                        
+                        transation_history_repository_record = await transation_history_repository.find_one(
+                            params=dict(
+                                task_id=UUID(task.id.value)
+                            )
+                        )
+                        
+                        await transation_history_repository.update(transation_history_repository_record, dict(
+                            status=TranslationHistoryStatus.cancelled.value
+                        ))
+                    
+                    await translation_request_repository.update(task, changes)
         
         print(e)
 

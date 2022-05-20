@@ -14,6 +14,8 @@ from infrastructure.configs.event_dispatcher import KafkaConsumer, KafkaProducer
 import os
 
 
+MAX_RETRIES = 1
+
 @unique
 class EnvStateEnum(str, ExtendedEnum):
 
@@ -511,6 +513,7 @@ class TranslationAPI(BaseModel):
     URL: AnyHttpUrl = Field(...)
     METHOD: str = Field(...)
     ALLOWED_CONCURRENT_REQUEST: int = Field(...)
+    TIMEOUT: int
 
 
 class LanguageDetectionAPI(BaseModel):
@@ -518,6 +521,7 @@ class LanguageDetectionAPI(BaseModel):
     URL: AnyHttpUrl = Field(...)
     METHOD: str = Field(...)
     ALLOWED_CONCURRENT_REQUEST: int = Field(...)
+    TIMEOUT: int
 
 
 class Pagination(BaseModel):
@@ -537,11 +541,20 @@ class Oauth2ProviderAPI(BaseModel):
 class Oauth2Provider(BaseModel):
 
     GOOGLE: Oauth2ProviderAPI = Field(...)
+    
+# class GmailAPICredential(BaseModel):
+    
+#     CLIENT_ID: str
+#     CLIENT_SECRET: str
+    
+#     TOKEN: str
 
 
 class GlobalConfig(BaseSettings):
 
     """Global configurations."""
+    
+    # GMAIL_GOOGLE_CREDENTIAL: GmailAPICredential
 
     APP_CONFIG: AppConfig = AppConfig()
 

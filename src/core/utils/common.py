@@ -1,6 +1,8 @@
 from typing import List
 import sys
 
+import traceback
+
 def first_elem(iterable, default = None, condition = lambda x: True):
 
     try:
@@ -33,3 +35,7 @@ def size_of(object, unit='b'):
     
     if unit == 'b': return sys.getsizeof(object)
     elif unit == 'mb': return sys.getsizeof(object) / 1024.0**2
+    
+def get_exception_log(e):
+    
+    return f"{e.__class__.__name__}: {str(e)}\n\n{traceback.format_exc()}"

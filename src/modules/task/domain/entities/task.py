@@ -23,6 +23,8 @@ class TaskProps(BaseModel):
     step_status: StepStatusEnum = Field(...)
     current_step: Union[TranslationTaskStepEnum, LanguageDetectionTaskStepEnum] = Field(...)
     file_type: Optional[AllowedFileTranslationExtensionEnum]
+    retry: int 
+    error_message: Optional[str] = ''
     
     # expired_date: DateVO = DateVO(None)
 
@@ -34,6 +36,8 @@ class TaskProps(BaseModel):
         
         if values['task_name'] in TRANSLATION_PRIVATE_TASKS and not values['creator_id'].value:
             raise ValueError('Creator cannot be None')
+        
+        if 'retry' not in values or not values['retry']: values['retry'] = 0
 
         return values
 

@@ -1,6 +1,16 @@
 from datetime import datetime, timedelta
 import os
 
+from email.mime.audio import MIMEAudio
+from email.mime.base import MIMEBase
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
+import google.auth
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+
 from os.path import getctime
 from os import listdir
 import aiofiles
@@ -25,7 +35,6 @@ logger = Logger('Task: delete_invalid_file')
 
 QUERY_SIZE = 3
 
-
 async def main():
 
     logger.debug(
@@ -36,9 +45,11 @@ async def main():
 
     try:
 
-        milestone = datetime.now() - timedelta(0, TASK_EXPIRATION_TIME)
+        # milestone = datetime.now() - timedelta(0, TASK_EXPIRATION_TIME)
 
-        saved_file_paths = [f for f in listdir(task_results_dir) if (get_file_created_time(f) < milestone)]
+        # saved_file_paths = [f for f in listdir(task_results_dir) if (get_file_created_time(f) < milestone)]
+        
+        saved_file_paths = [f for f in listdir(task_results_dir)]
 
         while len(saved_file_paths) > 0:
 

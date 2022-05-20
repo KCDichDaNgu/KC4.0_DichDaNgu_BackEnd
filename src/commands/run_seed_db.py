@@ -1,4 +1,4 @@
-import asyncio
+import asyncio, os
 from modules.user.database.seeding.admin_account_seeder import AdminAccountSeeder
 from commands import cli, click
 from infrastructure.configs import EnvStateEnum
@@ -7,6 +7,7 @@ from modules.system_setting.database.seeding.system_setting_seeder import System
 from infrastructure.configs.database import MongoDBDatabase
 
 from motor.motor_asyncio import AsyncIOMotorClient
+import shutil
 
 mongodb_collections = MongoDBDatabase(
     DATABASE_NAME='translation-tool',
@@ -48,7 +49,19 @@ def run_seed_db(
         database_name=database_name,
         drop_db=drop_db
     ))
+    
+    delete_folders()
 
+def delete_folders():
+    
+    for folder in ['static/file_language_detection', 'static/file_translation', 'static/task_result']:
+
+        if os.path.exists(folder):
+            shutil.rmtree(folder)
+            
+    os.makedirs('static/file_language_detection')
+    os.makedirs('static/file_translation')
+    os.makedirs('static/task_result')
 
 async def create_data(
     mongodb_uri,

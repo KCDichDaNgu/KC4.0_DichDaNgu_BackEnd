@@ -8,7 +8,7 @@ import pymongo
 from typing import List
 from uuid import UUID
 
-from infrastructure.configs.main import GlobalConfig, get_cnf, get_mongodb_instance
+from infrastructure.configs.main import GlobalConfig, get_cnf, get_mongodb_instance, MAX_RETRIES
 from infrastructure.configs.task import (
     TranslationTask_TranslationCompletedResultFileSchemaV1, 
     TranslationTask_NotYetTranslatedResultFileSchemaV1, 
@@ -28,6 +28,8 @@ import asyncio
 import aiohttp
 
 from infrastructure.adapters.logger import Logger
+
+from core.utils.common import get_exception_log
 
 config: GlobalConfig = get_cnf()
 db_instance = get_mongodb_instance()
@@ -149,32 +151,31 @@ async def mark_invalid_tasks(invalid_tasks_mapper):
 
 async def main():
     
-    system_setting = await system_setting_repository.find_one({})
-    
-    ALLOWED_CONCURRENT_REQUEST = system_setting.props.translation_api_allowed_concurrent_req
-    
-    if ALLOWED_CONCURRENT_REQUEST <= 0: return
-    
-    tasks = await translation_request_repository.find_many(
-        params=dict(
-            current_step=TranslationTaskStepEnum.translating_language.value,
-            step_status=StepStatusEnum.not_yet_processed.value
-        ),
-        limit=1,
-        order_by=[('created_at', pymongo.ASCENDING)]
-    )
-        
-    if not tasks or not (tasks[0].props.task_name == TranslationTaskNameEnum.public_plain_text_translation.value and \
-        tasks[0].props.current_step == TranslationTaskStepEnum.translating_language.value and
-        tasks[0].props.step_status in [StepStatusEnum.not_yet_processed.value, StepStatusEnum.in_progress.value]): return 
-
-    logger.debug(
-        msg=f'New task translate_plain_text_in_public_request.translate_content run in {datetime.now()}'
-    )
-
-    print(f'New task translate_plain_text_in_public_request.translate_content run in {datetime.now()}')
-    
     try:
+        system_setting = await system_setting_repository.find_one({})
+        
+        ALLOWED_CONCURRENT_REQUEST = system_setting.props.translation_api_allowed_concurrent_req
+        
+        if ALLOWED_CONCURRENT_REQUEST <= 0: return
+        
+        tasks = await translation_request_repository.find_many(
+            params=dict(
+                current_step=TranslationTaskStepEnum.translating_language.value,
+                step_status=StepStatusEnum.not_yet_processed.value
+            ),
+            limit=1,
+            order_by=[('created_at', pymongo.ASCENDING)]
+        )
+            
+        if not tasks or not (tasks[0].props.task_name == TranslationTaskNameEnum.public_plain_text_translation.value and \
+            tasks[0].props.current_step == TranslationTaskStepEnum.translating_language.value and
+            tasks[0].props.step_status in [StepStatusEnum.not_yet_processed.value, StepStatusEnum.in_progress.value]): return 
+
+        logger.debug(
+            msg=f'New task translate_plain_text_in_public_request.translate_content run in {datetime.now()}'
+        )
+
+        print(f'New task translate_plain_text_in_public_request.translate_content run in {datetime.now()}')
         
         tasks = await translation_request_repository.find_many(
             params=dict(
@@ -188,6 +189,7 @@ async def main():
             limit=ALLOWED_CONCURRENT_REQUEST,
             order_by=[('created_at', pymongo.ASCENDING)]
         )
+        
 
         tasks_id = list(map(lambda task: task.id.value, tasks))
 
@@ -215,9 +217,9 @@ async def main():
                 )
             )
         ]
-
+        
         tasks_result, translations_history = await asyncio.gather(*tasks_result_and_trans_history_req)
-
+        
         valid_tasks_mapper, invalid_tasks_mapper = await read_task_result(
             tasks=tasks, 
             tasks_result=tasks_result,
@@ -235,7 +237,37 @@ async def main():
             await execute_in_batch(valid_tasks_mapper, chunk, ALLOWED_CONCURRENT_REQUEST)
 
     except Exception as e:
-        logger.error(e)
+        
+        error_message = get_exception_log(e)
+        
+        async with db_instance.session() as session:
+            async with session.start_transaction():
+        
+                for task in tasks:
+                    
+                    retry = task.props.retry + 1
+                    
+                    changes = dict(
+                        retry=retry,
+                        error_message=error_message
+                    )
+                    
+                    if retry > MAX_RETRIES: 
+                        changes = dict(
+                            step_status=StepStatusEnum.cancelled.value
+                        )
+                        
+                        transation_history_repository_record = await transation_history_repository.find_one(
+                            params=dict(
+                                task_id=UUID(task.id.value)
+                            )
+                        )
+                        
+                        await transation_history_repository.update(transation_history_repository_record, dict(
+                            status=TranslationHistoryStatus.cancelled.value
+                        ))
+                    
+                    await translation_request_repository.update(task, changes)
         
         print(e)
 
