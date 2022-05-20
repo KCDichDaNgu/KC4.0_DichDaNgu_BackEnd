@@ -10,6 +10,7 @@ config: GlobalConfig = get_cnf()
 
 PUBLIC_LANGUAGE_DETECTION_API_CONF = config.PUBLIC_LANGUAGE_DETECTION_API
 PUBLIC_LANGUAGE_DETECTION_API_URL = PUBLIC_LANGUAGE_DETECTION_API_CONF.URL
+REQUEST_TIMEOUT = PUBLIC_LANGUAGE_DETECTION_API_CONF.TIMEOUT
 
 class LanguageDetectionResponse(BaseModel):
 
@@ -31,21 +32,29 @@ class LanguageDetector(LanguageDetectorPort):
         if public_request:
 
             headers = {'Content-Type': 'application/json'}
-
+            
+            # timeout = aiohttp.ClientTimeout(total=int(REQUEST_TIMEOUT))
+            
             if not session:
 
                 async with aiohttp.ClientSession() as session:
                     async with session.post(PUBLIC_LANGUAGE_DETECTION_API_URL, json={"data": text}, headers=headers) as response:
+                        
                         result = (await response.json())['data']
-
+                        
+                        if not result['status']: raise Exception(f"LanguageDetectionAPIError: {result['lang']} {result['lang_str']}")
+                            
                         result['lang'] = result['lang'] if result['lang'] in LanguageEnum.enum_values() else LanguageEnum.unknown.value
-
+                        
                         return LanguageDetectionResponse(**result)
 
             else:
                 async with session.post(PUBLIC_LANGUAGE_DETECTION_API_URL, json={"data": text}, headers=headers) as response:
-                    result = (await response.json())['data']
 
+                    result = (await response.json())['data']
+                    
+                    if not result['status']: raise Exception(f"LanguageDetectionAPIError: {result['lang']} {result['lang_str']}")
+                
                     result['lang'] = result['lang'] if result['lang'] in LanguageEnum.enum_values() else LanguageEnum.unknown.value
 
                     return LanguageDetectionResponse(**result)

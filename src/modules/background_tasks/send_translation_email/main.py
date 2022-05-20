@@ -45,6 +45,10 @@ async def main():
         email_for_sending_email = system_setting.props.email_for_sending_email
         email_password_for_sending_email = system_setting.props.email_password_for_sending_email
         
+        if not email_for_sending_email:
+            print('Email not setup')
+            return
+        
         tasks = await translation_request_repository.find_many(
             params={
                 'task_name': { '$in': TRANSLATION_PRIVATE_TASKS + TRANSLATION_PUBLIC_TASKS },
@@ -64,54 +68,51 @@ async def main():
         )
         
         if len(tasks) == 0: return
+            
+        smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
         
-        try: 
+        smtp_server.ehlo()
+        smtp_server.login(email_for_sending_email, email_password_for_sending_email)
+        
+        for task in tasks:
+            email_id = round(time.time())
             
-            smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+            msg = EmailMessage()
             
-            smtp_server.ehlo()
-            smtp_server.login(email_for_sending_email, email_password_for_sending_email)
+            msg['Subject'] = f'Kết quả dịch #{email_id}'
+            msg['To'] = task.props.receiver_email
+            msg['From'] = email_for_sending_email
             
-            for task in tasks:
-                email_id = round(time.time())
+            if task.props.task_name in PLAIN_TEXT_TRANSLATION_TASKS:
                 
-                msg = EmailMessage()
+                msg = await send_email_result_for_text_translation(task, msg)
                 
-                msg['Subject'] = f'Kết quả dịch #{email_id}'
-                msg['To'] = task.props.receiver_email
-                msg['From'] = email_for_sending_email
+            if task.props.task_name in FILE_TRANSLATION_TASKS:
                 
-                if task.props.task_name in PLAIN_TEXT_TRANSLATION_TASKS:
-                    
-                    msg = await send_email_result_for_text_translation(task, msg)
-                    
-                if task.props.task_name in FILE_TRANSLATION_TASKS:
-                    
-                    msg = await send_email_result_for_file_translation(task, msg)
-                
-                smtp_server.send_message(msg)
-                
-                total_email_sent = 0
-                
-                if task.props.total_email_sent == None: total_email_sent = 0
-                else: total_email_sent = task.props.total_email_sent + 1
-                
-                await translation_request_repository.update(
-                    task, 
-                    dict(
-                        total_email_sent=total_email_sent
-                    )
+                msg = await send_email_result_for_file_translation(task, msg)
+            
+            smtp_server.send_message(msg)
+            
+            total_email_sent = 0
+            
+            if task.props.total_email_sent == None: total_email_sent = 0
+            else: total_email_sent = task.props.total_email_sent + 1
+            
+            await translation_request_repository.update(
+                task, 
+                dict(
+                    total_email_sent=total_email_sent
                 )
-                    
-            smtp_server.close()
+            )
                 
-        except Exception as e:
-            logger.error(e)
+        smtp_server.close()
 
     except Exception as e:
         logger.error(e)
+        
+        import traceback
 
-        print(e)
+        print(traceback.print_exc())
 
     logger.debug(
         msg=f'An task send_translation_email end in {datetime.now()}\n'

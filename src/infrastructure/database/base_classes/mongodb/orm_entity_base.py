@@ -152,9 +152,11 @@ class OrmEntityBase(Document):
 
                     list_subquery.append(subquery)
 
-                query = {
-                    '$or': list_subquery
-                }
+                if len(list_subquery) > 0:
+                    query = {
+                        '$or': list_subquery
+                    }
+                else: query = dict()
 
                 from umongo.frameworks.motor_asyncio import SESSION
 

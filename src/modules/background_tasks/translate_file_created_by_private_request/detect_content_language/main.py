@@ -6,7 +6,7 @@ from docx import Document
 from typing import List
 from uuid import UUID
 import pymongo
-from infrastructure.configs.main import GlobalConfig, get_cnf, get_mongodb_instance
+from infrastructure.configs.main import GlobalConfig, get_cnf, get_mongodb_instance, MAX_RETRIES
 from infrastructure.configs.task import (
     TranslationTaskNameEnum, 
     TranslationTaskStepEnum, 
@@ -27,6 +27,8 @@ from infrastructure.adapters.logger import Logger
 from infrastructure.configs.translation_task import RESULT_FILE_STATUS, FileTranslationTask_NotYetTranslatedResultFileSchemaV1, FileTranslationTask_TranslationClosedResultFileSchemaV1
 from infrastructure.adapters.language_detector.main import LanguageDetector
 from infrastructure.configs.message import MESSAGES
+
+from core.utils.common import get_exception_log
 
 config: GlobalConfig = get_cnf()
 db_instance = get_mongodb_instance()
@@ -60,7 +62,7 @@ async def read_task_result(
         task_result = list(filter(lambda ts: ts.props.task_id.value == task_id, tasks_result))[0]
         trans_history = list(filter(lambda ts: ts.props.task_id.value == task_id, translations_history))[0]
 
-        try: 
+        try:
             data = await task_result.read_data_from_file()
 
             if data['status'] == RESULT_FILE_STATUS['language_not_yet_detected']:
@@ -71,9 +73,7 @@ async def read_task_result(
                     'trans_history': trans_history,
                     'task': task
                 }
-
         except Exception as e:
-            logger.error(e)
             print(e)
 
     valid_tasks_id = valid_tasks_mapper.keys()
@@ -141,19 +141,20 @@ async def mark_invalid_tasks(invalid_tasks_mapper):
 
 async def main():
     
-    system_setting = await system_setting_repository.find_one({})
-    
-    ALLOWED_CONCURRENT_REQUEST = system_setting.props.language_detection_api_allowed_concurrent_req
-    
-    if ALLOWED_CONCURRENT_REQUEST <= 0: return
-
-    logger.debug(
-        msg=f'New task translate_file_created_by_private_request.detect_content_language run in {datetime.now()}'
-    )
-
-    print(f'New task translate_file_created_by_private_request.detect_content_language run in {datetime.now()}')
-    
     try:
+    
+        system_setting = await system_setting_repository.find_one({})
+        
+        ALLOWED_CONCURRENT_REQUEST = system_setting.props.language_detection_api_allowed_concurrent_req
+        
+        if ALLOWED_CONCURRENT_REQUEST <= 0: return
+
+        logger.debug(
+            msg=f'New task translate_file_created_by_private_request.detect_content_language run in {datetime.now()}'
+        )
+
+        print(f'New task translate_file_created_by_private_request.detect_content_language run in {datetime.now()}')
+    
         tasks = await translation_request_repository.find_many(
             params=dict(
                 task_name=TranslationTaskNameEnum.private_file_translation.value,
@@ -212,7 +213,37 @@ async def main():
             await execute_in_batch(valid_tasks_mapper, chunk, ALLOWED_CONCURRENT_REQUEST)
 
     except Exception as e:
-        logger.error(e)
+        
+        error_message = get_exception_log(e)
+        
+        async with db_instance.session() as session:
+            async with session.start_transaction():
+        
+                for task in tasks:
+                    
+                    retry = task.props.retry + 1
+                    
+                    changes = dict(
+                        retry=retry,
+                        error_message=error_message
+                    )
+                    
+                    if retry > MAX_RETRIES: 
+                        changes = dict(
+                            step_status=StepStatusEnum.cancelled.value
+                        )
+                        
+                        transation_history_repository_record = await transation_history_repository.find_one(
+                            params=dict(
+                                task_id=UUID(task.id.value)
+                            )
+                        )
+                        
+                        await transation_history_repository.update(transation_history_repository_record, dict(
+                            status=TranslationHistoryStatus.cancelled.value
+                        ))
+                    
+                    await translation_request_repository.update(task, changes)
         
         print(e)
 

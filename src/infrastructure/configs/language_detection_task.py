@@ -41,6 +41,11 @@ FILE_LANGUAGE_DETECTION_TASKS = [
     LanguageDetectionTaskNameEnum.public_file_language_detection.value
 ]
 
+PLAIN_TEXT_LANGUAGE_DETECTION_TASKS = [
+    LanguageDetectionTaskNameEnum.public_plain_text_language_detection.value,
+    LanguageDetectionTaskNameEnum.private_plain_text_language_detection.value
+]
+
 class LanguageDetectionTaskStepEnum(str, ExtendedEnum):
 
     detecting_language = 'detecting_language'

@@ -9,7 +9,7 @@ import pymongo
 from typing import List
 from uuid import UUID
 
-from infrastructure.configs.main import GlobalConfig, get_cnf, get_mongodb_instance
+from infrastructure.configs.main import GlobalConfig, get_cnf, get_mongodb_instance, MAX_RETRIES
 from infrastructure.configs.task import (
     LanguageDetectionTask_LangUnknownResultFileSchemaV1, 
     LanguageDetectionTask_LanguageDetectionCompletedResultFileSchemaV1,
@@ -30,6 +30,7 @@ import aiohttp
 from infrastructure.adapters.logger import Logger
 
 from modules.system_setting.database.repository import SystemSettingRepository
+from core.utils.common import get_exception_log
 
 config: GlobalConfig = get_cnf()
 db_instance = get_mongodb_instance()
@@ -63,7 +64,7 @@ async def read_task_result(
         task_result = list(filter(lambda ts: ts.props.task_id.value == task_id, tasks_result))[0]
         trans_history = list(filter(lambda ts: ts.props.task_id.value == task_id, language_detections_history))[0]
 
-        try: 
+        try:
             data = await task_result.read_data_from_file()
             
             if data['status'] == LanguageDetectionTask_LangUnknownResultFileSchemaV1(
@@ -77,10 +78,7 @@ async def read_task_result(
                     'trans_history': trans_history,
                     'task': task
                 }
-
         except Exception as e:
-            logger.error(e)
-            
             print(e)
             
     valid_tasks_id = valid_tasks_mapper.keys()
@@ -149,32 +147,32 @@ async def mark_invalid_tasks(invalid_tasks_mapper):
 
 async def main():
     
-    system_setting = await system_setting_repository.find_one({})
-    
-    ALLOWED_CONCURRENT_REQUEST = system_setting.props.language_detection_api_allowed_concurrent_req
-    
-    if ALLOWED_CONCURRENT_REQUEST <= 0: return
-    
-    tasks = await language_detection_request_repository.find_many(
-        params=dict(
-            current_step=LanguageDetectionTaskStepEnum.detecting_language.value,
-            step_status=StepStatusEnum.not_yet_processed.value
-        ),
-        limit=1,
-        order_by=[('created_at', pymongo.ASCENDING)]
-    )
-        
-    if not tasks or not (tasks[0].props.task_name == LanguageDetectionTaskNameEnum.private_plain_text_language_detection.value and \
-        tasks[0].props.current_step == LanguageDetectionTaskStepEnum.detecting_language.value and \
-        tasks[0].props.step_status in [StepStatusEnum.not_yet_processed.value]): return 
-
-    logger.debug(
-        msg=f'New task detect_plain_text_language_created_by_private_request run in {datetime.now()}'
-    )
-
-    print(f'New task detect_plain_text_language_created_by_private_request run in {datetime.now()}')
-    
     try:
+        
+        system_setting = await system_setting_repository.find_one({})
+        
+        ALLOWED_CONCURRENT_REQUEST = system_setting.props.language_detection_api_allowed_concurrent_req
+        
+        if ALLOWED_CONCURRENT_REQUEST <= 0: return
+        
+        tasks = await language_detection_request_repository.find_many(
+            params=dict(
+                current_step=LanguageDetectionTaskStepEnum.detecting_language.value,
+                step_status=StepStatusEnum.not_yet_processed.value
+            ),
+            limit=1,
+            order_by=[('created_at', pymongo.ASCENDING)]
+        )
+
+        if not tasks or not (tasks[0].props.task_name == LanguageDetectionTaskNameEnum.private_plain_text_language_detection.value and \
+            tasks[0].props.current_step == LanguageDetectionTaskStepEnum.detecting_language.value and \
+            tasks[0].props.step_status in [StepStatusEnum.not_yet_processed.value]): return 
+
+        logger.debug(
+            msg=f'New task detect_plain_text_language_created_by_private_request run in {datetime.now()}'
+        )
+
+        print(f'New task detect_plain_text_language_created_by_private_request run in {datetime.now()}')
         
         tasks = await language_detection_request_repository.find_many(
             params=dict(
@@ -187,9 +185,9 @@ async def main():
             ),
             limit=ALLOWED_CONCURRENT_REQUEST
         )
-
+        
         tasks_id = list(map(lambda task: task.id.value, tasks))
-
+        
         if len(tasks_id) == 0: 
             logger.debug(
                 msg=f'An task detect_plain_text_language_created_by_private_request end in {datetime.now()}\n'
@@ -231,18 +229,41 @@ async def main():
         chunked_tasks_id = list(chunk_arr(valid_tasks_id, ALLOWED_CONCURRENT_REQUEST))
 
         for chunk in chunked_tasks_id:
-
-            try:
-            
-                await execute_in_batch(valid_tasks_mapper, chunk, ALLOWED_CONCURRENT_REQUEST)
-                
-            except Exception as e:
-                logger.error(e)
-                
-                print(e)
+           
+            await execute_in_batch(valid_tasks_mapper, chunk, ALLOWED_CONCURRENT_REQUEST)
 
     except Exception as e:
-        logger.error(e)
+        
+        error_message = get_exception_log(e)
+        
+        async with db_instance.session() as session:
+            async with session.start_transaction():
+        
+                for task in tasks:
+                    
+                    retry = task.props.retry + 1
+                    
+                    changes = dict(
+                        retry=retry,
+                        error_message=error_message
+                    )
+                    
+                    if retry > MAX_RETRIES: 
+                        changes = dict(
+                            step_status=StepStatusEnum.cancelled.value
+                        )
+                        
+                        language_detection_history_record = await language_detection_history.find_one(
+                            params=dict(
+                                task_id=UUID(task.id.value)
+                            )
+                        )
+                        
+                        await language_detection_history.update(language_detection_history_record, dict(
+                            status=LanguageDetectionHistoryStatus.cancelled.value
+                        ))
+                    
+                    await language_detection_request_repository.update(task, changes)
         
         print(e)
 

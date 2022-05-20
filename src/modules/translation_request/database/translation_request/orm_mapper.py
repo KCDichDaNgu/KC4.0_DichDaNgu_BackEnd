@@ -39,6 +39,8 @@ class TranslationRequestOrmMapper(
             'total_email_sent': props.total_email_sent,
             'receiver_email': props.receiver_email,
             'file_type': props.file_type,
+            'retry': props.retry,
+            'error_message': props.error_message
             # 'expired_date': props.expired_date.value,
         }
         
@@ -56,6 +58,8 @@ class TranslationRequestOrmMapper(
             'total_email_sent': orm_entity.total_email_sent,
             'receiver_email': orm_entity.receiver_email,
             'file_type': orm_entity.file_type,
+            'retry': orm_entity.retry,
+            'error_message': orm_entity.error_message
             # 'expired_date': DateVO(orm_entity.expired_date)
         }
 

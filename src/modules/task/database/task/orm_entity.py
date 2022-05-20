@@ -50,6 +50,10 @@ class TaskOrmEntity(OrmEntityBase):
         allow_none=True,
         validate=validate.OneOf(AllowedFileTranslationExtensionEnum.enum_values())
     )
+    
+    retry = fields.IntegerField(default=0)
+    
+    error_message = fields.StringField(default='')
 
     # expired_date = fields.DateTimeField(required=True, allow_none=True)
 

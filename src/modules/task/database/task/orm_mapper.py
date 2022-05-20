@@ -26,7 +26,9 @@ class TaskOrmMapper(OrmMapperBase[TaskEntity, TaskOrmEntity]):
             'creator_type': props.creator_type,
             'step_status': props.step_status,
             'current_step': props.current_step,
-            'file_type': props.file_type
+            'file_type': props.file_type,
+            'retry': props.retry,
+            'error_message': props.error_message
             # 'expired_date': props.expired_date.value,
         }
         
@@ -40,7 +42,9 @@ class TaskOrmMapper(OrmMapperBase[TaskEntity, TaskOrmEntity]):
             'creator_type': orm_entity.creator_type,
             'step_status': orm_entity.step_status,
             'current_step': orm_entity.current_step,
-            'file_type': props.file_type
+            'file_type': orm_entity.file_type,
+            'retry': orm_entity.retry,
+            'error_message': orm_entity.error_message
             # 'expired_date': DateVO(orm_entity.expired_date)
         }
 

@@ -12,7 +12,7 @@ import pymongo
 from typing import List
 from uuid import UUID
 
-from infrastructure.configs.main import GlobalConfig, get_cnf, get_mongodb_instance
+from infrastructure.configs.main import GlobalConfig, get_cnf, get_mongodb_instance, MAX_RETRIES
 from infrastructure.configs.task import (
     LanguageDetectionTask_LangUnknownResultFileSchemaV1, 
     LanguageDetectionTask_LanguageDetectionCompletedResultFileSchemaV1,
@@ -32,6 +32,7 @@ import asyncio
 import aiohttp
 
 from infrastructure.adapters.logger import Logger
+from core.utils.common import get_exception_log
 
 config: GlobalConfig = get_cnf()
 db_instance = get_mongodb_instance()
@@ -152,32 +153,32 @@ async def mark_invalid_tasks(invalid_tasks_mapper):
 
 async def main():
     
-    system_setting = await system_setting_repository.find_one({})
-    
-    ALLOWED_CONCURRENT_REQUEST = system_setting.props.language_detection_api_allowed_concurrent_req
-    
-    if ALLOWED_CONCURRENT_REQUEST <= 0: return
-    
-    tasks = await language_detection_request_repository.find_many(
-        params=dict(
-            current_step=LanguageDetectionTaskStepEnum.detecting_language.value,
-            step_status=StepStatusEnum.not_yet_processed.value
-        ),
-        limit=1,
-        order_by=[('created_at', pymongo.ASCENDING)]
-    )
-        
-    if  not tasks or not (tasks[0].props.task_name == LanguageDetectionTaskNameEnum.private_file_language_detection.value and \
-        tasks[0].props.current_step == LanguageDetectionTaskStepEnum.detecting_language.value and \
-        tasks[0].props.step_status in [StepStatusEnum.not_yet_processed.value]): return 
-
-    logger.debug(
-        msg=f'New task detect_file_language_created_by_private_request run in {datetime.now()}'
-    )
-
-    print(f'New task detect_file_language_created_by_private_request run in {datetime.now()}')
-    
     try:
+        system_setting = await system_setting_repository.find_one({})
+        
+        ALLOWED_CONCURRENT_REQUEST = system_setting.props.language_detection_api_allowed_concurrent_req
+        
+        if ALLOWED_CONCURRENT_REQUEST <= 0: return
+        
+        tasks = await language_detection_request_repository.find_many(
+            params=dict(
+                current_step=LanguageDetectionTaskStepEnum.detecting_language.value,
+                step_status=StepStatusEnum.not_yet_processed.value
+            ),
+            limit=1,
+            order_by=[('created_at', pymongo.ASCENDING)]
+        )
+            
+        if  not tasks or not (tasks[0].props.task_name == LanguageDetectionTaskNameEnum.private_file_language_detection.value and \
+            tasks[0].props.current_step == LanguageDetectionTaskStepEnum.detecting_language.value and \
+            tasks[0].props.step_status in [StepStatusEnum.not_yet_processed.value]): return 
+
+        logger.debug(
+            msg=f'New task detect_file_language_created_by_private_request run in {datetime.now()}'
+        )
+
+        print(f'New task detect_file_language_created_by_private_request run in {datetime.now()}')
+
         
         tasks = await language_detection_request_repository.find_many(
             params=dict(
@@ -234,20 +235,41 @@ async def main():
         chunked_tasks_id = list(chunk_arr(valid_tasks_id, ALLOWED_CONCURRENT_REQUEST))
 
         for chunk in chunked_tasks_id:
-
-            try:
             
-                await execute_in_batch(valid_tasks_mapper, chunk, ALLOWED_CONCURRENT_REQUEST)
-                
-            except Exception as e:
-                logger.error(e)
-                
-                print(e)
+            await execute_in_batch(valid_tasks_mapper, chunk, ALLOWED_CONCURRENT_REQUEST)
 
     except Exception as e:
-        logger.error(e)
+
+        error_message = get_exception_log(e)
         
-        print(e)
+        async with db_instance.session() as session:
+            async with session.start_transaction():
+        
+                for task in tasks:
+                    
+                    retry = task.props.retry + 1
+                    
+                    changes = dict(
+                        retry=retry,
+                        error_message=error_message
+                    )
+                    
+                    if retry > MAX_RETRIES: 
+                        changes = dict(
+                            step_status=StepStatusEnum.cancelled.value
+                        )
+                        
+                        language_detection_history_record = await language_detection_history.find_one(
+                            params=dict(
+                                task_id=UUID(task.id.value)
+                            )
+                        )
+                        
+                        await language_detection_history.update(language_detection_history_record, dict(
+                            status=LanguageDetectionHistoryStatus.cancelled.value
+                        ))
+                    
+                    await language_detection_request_repository.update(task, changes)
 
     logger.debug(
         msg=f'An task detect_file_language_created_by_private_request end in {datetime.now()}\n'
@@ -272,30 +294,22 @@ async def execute_in_batch(valid_tasks_mapper, tasks_id, allowed_concurrent_requ
             file_type = task_result_content['file_type']
             source_text = ''
             
-            try:
-                if file_type == 'docx':
-                    doc = Document(source_file_full_path)
-                    
-                    for paragraph in doc.paragraphs:
-                        source_text = source_text + paragraph.text
-                elif file_type == 'txt':
-                    try:
+            if file_type == 'docx':
+                doc = Document(source_file_full_path)
+                
+                for paragraph in doc.paragraphs:
+                    source_text = source_text + paragraph.text
+            elif file_type == 'txt':
 
-                        original_file = open(source_file_full_path, mode='r',encoding="utf-16", errors="ignore")
-                        source_text = original_file.read()
+                original_file = open(source_file_full_path, mode='r',encoding="utf-16", errors="ignore")
+                source_text = original_file.read()
 
-                    except Exception as e:
-                        original_file = open(source_file_full_path, mode='r',encoding="utf-8", errors="ignore")
-                        source_text = original_file.read()
-                        
-                elif file_type == 'pptx':
-                    source_text = get_presentation_full_text(source_file_full_path)
                     
-                elif file_type == 'xlsx':
-                    source_text = get_worksheet_full_text(source_file_full_path)
-                    
-            except Exception as e:
-                print(e)
+            elif file_type == 'pptx':
+                source_text = get_presentation_full_text(source_file_full_path)
+                
+            elif file_type == 'xlsx':
+                source_text = get_worksheet_full_text(source_file_full_path)
 
             api_requests.append(
                 languageDetector.detect(
