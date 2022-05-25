@@ -80,7 +80,7 @@ async def main():
             return
 
         invalid_tasks = await task_repository.find_many(
-           params={
+            params={
                 "$and": [
                     {
                         "$and": [
@@ -106,45 +106,17 @@ async def main():
                        } 
                     }
                 ]
-            }
+            },
+            limit=10,
         )
         
         if len(invalid_tasks) == 0: return
         
-        smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-        
-        smtp_server.ehlo()
-        smtp_server.login(email_for_sending_email, email_password_for_sending_email)
-        
-        for task in invalid_tasks:
-            
-            email_id = round(time.time())
-                
-            msg = EmailMessage()
-            
-            msg['Subject'] = f'TranslationServerError - Lỗi phần mềm dịch #{email_id}'
-            msg['To'] = email_for_sending_email
-            msg['From'] = email_for_sending_email
-            
-            if task.props.task_name in PLAIN_TEXT_TRANSLATION_TASKS:
-                
-                await send_email_for_cancelled_plain_text_translation(task, msg)
-                
-            if task.props.task_name in FILE_TRANSLATION_TASKS:
-                
-                await send_email_for_cancelled_file_translation(task, msg)
-                
-            if task.props.task_name in PLAIN_TEXT_LANGUAGE_DETECTION_TASKS:
-                
-                await send_email_for_cancelled_plain_text_language_detection(task, msg)
-                
-            if task.props.task_name in FILE_LANGUAGE_DETECTION_TASKS:
-                
-                await send_email_for_cancelled_file_language_detection(task, msg)
-                
-            smtp_server.send_message(msg)
-            
-        smtp_server.close()
+        await send_mail_for_cancelled_tasks(
+            invalid_tasks, 
+            email_for_sending_email, 
+            email_password_for_sending_email
+        )
         
         invalid_tasks_ids = list(map(lambda task: task.id.value, invalid_tasks)) if not invalid_tasks is None else []
 
@@ -214,6 +186,43 @@ async def main():
     logger.debug(
         msg=f'An task delete_invalid_task end in {datetime.now()}\n'
     )
+    
+async def send_mail_for_cancelled_tasks(invalid_tasks, email_for_sending_email, email_password_for_sending_email):
+    
+    smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=1000)
+    
+    smtp_server.ehlo()
+    smtp_server.login(email_for_sending_email, email_password_for_sending_email)
+    
+    for task in invalid_tasks:
+        
+        email_id = round(time.time())
+            
+        msg = EmailMessage()
+        
+        msg['Subject'] = f'TranslationServerError - Lỗi phần mềm dịch #{email_id}'
+        msg['To'] = email_for_sending_email
+        msg['From'] = email_for_sending_email
+        
+        if task.props.task_name in PLAIN_TEXT_TRANSLATION_TASKS:
+            
+            await send_email_for_cancelled_plain_text_translation(task, msg)
+            
+        if task.props.task_name in FILE_TRANSLATION_TASKS:
+            
+            await send_email_for_cancelled_file_translation(task, msg)
+            
+        if task.props.task_name in PLAIN_TEXT_LANGUAGE_DETECTION_TASKS:
+            
+            await send_email_for_cancelled_plain_text_language_detection(task, msg)
+            
+        if task.props.task_name in FILE_LANGUAGE_DETECTION_TASKS:
+            
+            await send_email_for_cancelled_file_language_detection(task, msg)
+            
+        smtp_server.send_message(msg)
+        
+    smtp_server.close()
     
 async def send_email_for_cancelled_plain_text_translation(task, msg: EmailMessage):
     

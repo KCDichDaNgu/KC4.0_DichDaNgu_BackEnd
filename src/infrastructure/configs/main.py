@@ -265,19 +265,19 @@ class AppConfig(BaseModel):
         "delete_invalid_file": BackgroundTask(
             ID="delete_invalid_file",
             TRIGGER=BackgroundTaskTriggerEnum.interval.value,
-            CONFIG=dict(seconds=0, max_instances=1),
+            CONFIG=dict(seconds=5, max_instances=1),
         ),
 
         "delete_invalid_task": BackgroundTask(
             ID="delete_invalid_task",
             TRIGGER=BackgroundTaskTriggerEnum.interval.value,
-            CONFIG=dict(seconds=0, max_instances=1),
+            CONFIG=dict(seconds=5, max_instances=1),
         ),
 
         "send_translation_email": BackgroundTask(
             ID="send_translation_email",
             TRIGGER=BackgroundTaskTriggerEnum.interval.value,
-            CONFIG=dict(seconds=0, max_instances=1),
+            CONFIG=dict(seconds=5, max_instances=1),
         ),
 
 
