@@ -63,13 +63,13 @@ async def main():
                 },
                 'total_email_sent': { '$in': [None, 0] }
             },
-            limit=1,
+            limit=10,
             order_by=[('created_at', pymongo.ASCENDING)]
         )
         
         if len(tasks) == 0: return
             
-        smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=1000)
         
         smtp_server.ehlo()
         smtp_server.login(email_for_sending_email, email_password_for_sending_email)

@@ -34,7 +34,7 @@ class LanguageDetector(LanguageDetectorPort):
             headers = {'Content-Type': 'application/json'}
             
             # timeout = aiohttp.ClientTimeout(total=int(REQUEST_TIMEOUT))
-            
+
             if not session:
 
                 async with aiohttp.ClientSession() as session:
