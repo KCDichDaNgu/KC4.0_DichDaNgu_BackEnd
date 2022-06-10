@@ -154,7 +154,7 @@ async def main():
     try:
         system_setting = await system_setting_repository.find_one({})
         
-        ALLOWED_CONCURRENT_REQUEST = system_setting.props.translation_api_allowed_concurrent_req
+        ALLOWED_CONCURRENT_REQUEST = 1
         
         if ALLOWED_CONCURRENT_REQUEST <= 0: return
         
@@ -164,13 +164,13 @@ async def main():
                 step_status=StepStatusEnum.not_yet_processed.value
             ),
             limit=1,
-            order_by=[('created_at', pymongo.ASCENDING)]
+            # order_by=[('created_at', pymongo.ASCENDING)]
         )
             
         if not tasks or not (tasks[0].props.task_name == TranslationTaskNameEnum.public_plain_text_translation.value and \
             tasks[0].props.current_step == TranslationTaskStepEnum.translating_language.value and
             tasks[0].props.step_status in [StepStatusEnum.not_yet_processed.value, StepStatusEnum.in_progress.value]): return 
-
+        
         logger.debug(
             msg=f'New task translate_plain_text_in_public_request.translate_content run in {datetime.now()}'
         )
@@ -186,10 +186,9 @@ async def main():
                 #     "$gt": datetime.now()
                 # }
             ),
-            limit=ALLOWED_CONCURRENT_REQUEST,
-            order_by=[('created_at', pymongo.ASCENDING)]
+            limit=1,
+            # order_by=[('created_at', pymongo.ASCENDING)]
         )
-        
 
         tasks_id = list(map(lambda task: task.id.value, tasks))
 
