@@ -301,9 +301,15 @@ async def execute_in_batch(valid_tasks_mapper, tasks_id, allowed_concurrent_requ
             target_lang = valid_tasks_mapper[task_id]['task_result_content']['target_lang']
             original_text = ''
 
+            try:
 
-            original_file = open(original_file_full_path, mode='r',encoding="utf-16", errors="ignore")
-            original_text = original_file.read()
+                original_file = open(original_file_full_path, mode='r',encoding="utf-8", errors="ignore")
+                original_text = original_file.read()
+            
+            except:
+                
+                original_file = open(original_file_full_path, mode='r',encoding="utf-16", errors="ignore")
+                original_text = original_file.read()
 
                 
             if source_lang == target_lang:
