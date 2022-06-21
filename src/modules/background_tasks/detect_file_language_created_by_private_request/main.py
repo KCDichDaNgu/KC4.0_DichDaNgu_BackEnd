@@ -300,9 +300,16 @@ async def execute_in_batch(valid_tasks_mapper, tasks_id, allowed_concurrent_requ
                 for paragraph in doc.paragraphs:
                     source_text = source_text + paragraph.text
             elif file_type == 'txt':
+                
+                try:
 
-                original_file = open(source_file_full_path, mode='r',encoding="utf-16", errors="ignore")
-                source_text = original_file.read()
+                    original_file = open(source_file_full_path, mode='r',encoding="utf-8", errors="ignore")
+                    source_text = original_file.read()
+                
+                except:
+                    
+                    original_file = open(source_file_full_path, mode='r',encoding="utf-16", errors="ignore")
+                    source_text = original_file.read()
 
                     
             elif file_type == 'pptx':
