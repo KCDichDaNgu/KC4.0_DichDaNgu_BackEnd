@@ -1,5 +1,5 @@
 import re
-from infrastructure.configs.translation_task import TRANSLATION_PRIVATE_TASKS
+from infrastructure.configs.translation_task import TRANSLATION_PRIVATE_TASKS, TRANSLATION_PUBLIC_TASKS
 
 from core.middlewares.authentication.core import get_me
 from core.value_objects.id import ID
@@ -73,7 +73,8 @@ class UpdateReceiverEmail(HTTPMethodView):
             )
             
 
-        if translation_request.props.task_name in TRANSLATION_PRIVATE_TASKS and not user:
+        if (translation_request.props.task_name in TRANSLATION_PRIVATE_TASKS and not user) or \
+            (user and translation_request.props.task_name in TRANSLATION_PRIVATE_TASKS and translation_request.props.creator_id.value != user.id):
                
             return response.json(
                 status=401,

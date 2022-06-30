@@ -140,7 +140,7 @@ class GetManyTranslationHistory(HTTPMethodView):
                 'status': item.props.status,
                 'updatedAt': str(item.updated_at.value),
                 'createdAt': str(item.created_at.value),
-                'resultUrl': get_full_path(get_task_result_file_path(item.props.file_path))
+                'resultUrl': get_full_path(get_task_result_file_path(item.props.file_path)),
             }, translation_history)
         )
  

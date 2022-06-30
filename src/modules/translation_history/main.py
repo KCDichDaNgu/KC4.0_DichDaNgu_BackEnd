@@ -1,5 +1,7 @@
 from modules.translation_history.queries.get_single_translation_history.http_controller import GetSingleTranslationHistory
 from modules.translation_history.queries.get_many_translation_history.http_controller import GetManyTranslationHistory
+from modules.translation_history.queries.get_many_translation_history_feedback.http_controller import GetManyTranslationHistoryFeedback
+
 from sanic import Blueprint
 from infrastructure.configs import GlobalConfig, get_cnf
 
@@ -22,4 +24,10 @@ translation_history_bp.add_route(
     GetManyTranslationHistory.as_view(), 
     uri=APP_CONFIG.ROUTES['translation_history.list']['path'],
     methods=[APP_CONFIG.ROUTES['translation_history.list']['method']]
+)
+
+translation_history_bp.add_route(
+    GetManyTranslationHistoryFeedback.as_view(), 
+    uri=APP_CONFIG.ROUTES['translation_history.get_feedback_list']['path'],
+    methods=[APP_CONFIG.ROUTES['translation_history.get_feedback_list']['method']]
 )

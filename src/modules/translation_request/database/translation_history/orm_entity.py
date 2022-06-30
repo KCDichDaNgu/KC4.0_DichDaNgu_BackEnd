@@ -1,4 +1,8 @@
-from infrastructure.configs.translation_history import TranslationHistoryTypeEnum, TranslationHistoryStatus
+from infrastructure.configs.translation_history import (
+    TranslationHistoryTypeEnum, 
+    TranslationHistoryStatus, 
+    TranslationHistoryRating
+)
 from infrastructure.database.base_classes.mongodb import OrmEntityBase
 from infrastructure.configs.main import MongoDBDatabase, GlobalConfig, get_cnf
 from infrastructure.configs.main import get_mongodb_instance
@@ -25,6 +29,14 @@ class TranslationHistoryOrmEntity(OrmEntityBase):
     )
 
     file_path = fields.StringField(allow_none=True)
+    
+    rating = fields.StringField(
+        allow_none=True,
+        validate=validate.OneOf(TranslationHistoryRating.enum_values())
+    )
+    
+    user_edited_translation = fields.StringField(allow_none=True)
+    user_updated_at = fields.DateTimeField(allow_none=True)
 
     class Meta:
         collection_name = database_config.COLLECTIONS['translation_history']['name']
