@@ -156,7 +156,9 @@ class GetSingleTranslationHistory(HTTPMethodView):
                 'createdAt': str(translation_history.created_at.value),
                 'resultUrl': translation_history.props.real_file_path,
                 'posInTranslationQueue': pos_in_translation_queue,
-                'estimatedWattingTime': estimated_watting_time
+                'estimatedWattingTime': estimated_watting_time,
+                'rating': translation_history.props.rating,
+                'userEditedTranslation': translation_history.props.user_edited_translation,
             },
             'message': MESSAGES['success']
         }).dict())

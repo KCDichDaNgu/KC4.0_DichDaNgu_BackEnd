@@ -3,6 +3,7 @@ from infrastructure.configs import GlobalConfig, get_cnf
 from modules.translation_request.commands.create_plain_text_translation_request.http_controller import CreatePlainTextTranslationRequest
 from modules.translation_request.commands.create_file_translation_request.http_controller import CreateFileTranslationRequest
 from modules.translation_request.commands.update_receiver_email.http_controller import UpdateReceiverEmail
+from modules.translation_request.commands.update_by_owner.http_controller import UpdateByOwner
 
 config: GlobalConfig = get_cnf()
 
@@ -29,4 +30,10 @@ translation_request_bp.add_route(
     UpdateReceiverEmail.as_view(), 
     uri=APP_CONFIG.ROUTES['translation_request.update_receiver_email']['path'],
     methods=[APP_CONFIG.ROUTES['translation_request.update_receiver_email']['method']]
+)
+
+translation_request_bp.add_route(
+    UpdateByOwner.as_view(), 
+    uri=APP_CONFIG.ROUTES['translation_request.update_by_owner']['path'],
+    methods=[APP_CONFIG.ROUTES['translation_request.update_by_owner']['method']]
 )

@@ -1,5 +1,7 @@
+from datetime import datetime
 import io
 from uuid import UUID
+from modules.translation_request.commands.update_by_owner.command import UpdateByOwnerCommand
 from infrastructure.configs.language import LanguageEnum
 from modules.translation_request.domain.entities.translation_history import TranslationHistoryProps
 from core.value_objects import ID
@@ -138,6 +140,31 @@ class TranslationRequestDService():
                 )
                 
                 return translation_request
+            
+    async def update_by_owner(self, command: UpdateByOwnerCommand):
+        
+        async with self.__db_instance.session() as session:
+            async with session.start_transaction():
+                
+                translation_history = await self.__translation_history_repository.find_one({'id': UUID(command.id.value)})
+                
+                changes = dict(
+                    user_edited_translation=command.user_edited_translation,
+                    user_updated_at=datetime.now()
+                )
+                
+                if command.rating:
+                    changes.update(dict(rating=command.rating))
+                    
+                    if translation_history.props.rating != command.rating:
+                        del changes['user_edited_translation']
+                
+                translation_history = await self.__translation_history_repository.update(
+                    translation_history,
+                    changes
+                )
+                
+                return translation_history
 
     async def create_file_translation_request(self, command: CreateFileTranslationRequestCommand):
         

@@ -2,6 +2,7 @@ from pydantic import Field
 from typing import Optional
 
 from pydantic.fields import PrivateAttr
+from core.value_objects.date import DateVO
 from core.base_classes.entity import Entity
 from pydantic.main import BaseModel
 from core.value_objects import ID
@@ -9,7 +10,11 @@ from core.value_objects import ID
 import aiofiles
 import json, os
 
-from infrastructure.configs.translation_history import TranslationHistoryTypeEnum, TranslationHistoryStatus
+from infrastructure.configs.translation_history import (
+    TranslationHistoryTypeEnum, 
+    TranslationHistoryStatus, 
+    TranslationHistoryRating
+)
 
 from typing import get_args
 
@@ -23,6 +28,9 @@ class TranslationHistoryProps(BaseModel):
     translation_type: TranslationHistoryTypeEnum = Field(...)
     status: TranslationHistoryStatus = Field(...)
     file_path: Optional[str]
+    rating: Optional[TranslationHistoryRating]
+    user_edited_translation: Optional[str]
+    user_updated_at: Optional[DateVO]
 
     class Config:
         use_enum_values = True

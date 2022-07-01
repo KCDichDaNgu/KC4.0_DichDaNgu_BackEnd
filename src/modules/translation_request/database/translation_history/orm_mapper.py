@@ -26,7 +26,10 @@ class TranslationHistoryOrmMapper(OrmMapperBase[TranslationHistoryEntity, Transl
             'task_id': props.task_id.value,
             'translation_type': props.translation_type,
             'status': props.status,
-            'file_path': props.file_path
+            'file_path': props.file_path,
+            'rating': props.rating,
+            'user_edited_translation': props.user_edited_translation,
+            'user_updated_at': props.user_updated_at.value if props.user_updated_at else None
         }
         
         return orm_props
@@ -39,6 +42,9 @@ class TranslationHistoryOrmMapper(OrmMapperBase[TranslationHistoryEntity, Transl
             'translation_type': orm_entity.translation_type,
             'status': orm_entity.status,
             'file_path': orm_entity.file_path,
+            'rating': orm_entity.rating,
+            'user_edited_translation': orm_entity.user_edited_translation,
+            'user_updated_at': DateVO(orm_entity.user_updated_at)
         }
 
         return props

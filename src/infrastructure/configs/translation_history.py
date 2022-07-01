@@ -18,6 +18,11 @@ TRANSLATION_HISTORY_PRIVATE_TYPES = [
     TranslationHistoryTypeEnum.private_plain_text_translation.value
 ]
 
+class TranslationHistoryRating(str, ExtendedEnum):
+    
+    good = 'good'
+    bad = 'bad'
+
 class TranslationHistoryStatus(str, ExtendedEnum):
 
     translating = 'translating'
