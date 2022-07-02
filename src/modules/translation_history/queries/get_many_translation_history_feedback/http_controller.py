@@ -163,9 +163,11 @@ class GetManyTranslationHistoryFeedback(HTTPMethodView):
         if not rating is None:
             if type(rating) == list:
                 query['rating'] = {'$in': rating}
+                query['rating'] = {'$in': [None if r == 'not_rated' else r for r in rating]}
             else:
                 query['rating'] = rating
-                
+                query['rating'] = None if rating == 'not_rated' else rating
+        
         if not status is None:
             if type(status) == list:
                 query['status'] = {'$in': status}
