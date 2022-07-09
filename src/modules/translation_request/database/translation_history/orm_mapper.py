@@ -29,7 +29,9 @@ class TranslationHistoryOrmMapper(OrmMapperBase[TranslationHistoryEntity, Transl
             'file_path': props.file_path,
             'rating': props.rating,
             'user_edited_translation': props.user_edited_translation,
-            'user_updated_at': props.user_updated_at.value if props.user_updated_at else None
+            'user_updated_at': props.user_updated_at.value if props.user_updated_at else None,
+            'source_lang': props.source_lang,
+            'target_lang': props.target_lang
         }
         
         return orm_props
@@ -44,7 +46,9 @@ class TranslationHistoryOrmMapper(OrmMapperBase[TranslationHistoryEntity, Transl
             'file_path': orm_entity.file_path,
             'rating': orm_entity.rating,
             'user_edited_translation': orm_entity.user_edited_translation,
-            'user_updated_at': DateVO(orm_entity.user_updated_at)
+            'user_updated_at': DateVO(orm_entity.user_updated_at),
+            'source_lang': orm_entity.source_lang,
+            'target_lang': orm_entity.target_lang
         }
 
         return props

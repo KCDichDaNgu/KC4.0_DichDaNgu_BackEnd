@@ -31,6 +31,8 @@ class TranslationHistoryProps(BaseModel):
     rating: Optional[TranslationHistoryRating]
     user_edited_translation: Optional[str]
     user_updated_at: Optional[DateVO]
+    source_lang: Optional[str]
+    target_lang: Optional[str]
 
     class Config:
         use_enum_values = True

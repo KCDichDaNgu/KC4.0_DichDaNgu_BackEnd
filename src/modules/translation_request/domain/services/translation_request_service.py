@@ -106,7 +106,9 @@ class TranslationRequestDService():
                     task_id=new_request.id,
                     translation_type=task_name,
                     status=TranslationHistoryStatus.translating.value,
-                    file_path=new_task_result_entity.props.file_path
+                    file_path=new_task_result_entity.props.file_path,
+                    source_lang=command.source_lang,
+                    target_lang=command.target_lang
                 )
             )
             
@@ -277,7 +279,9 @@ class TranslationRequestDService():
                     task_id=new_request.id,
                     translation_type=task_name,
                     status=TranslationHistoryStatus.translating.value,
-                    file_path=new_task_result_entity.props.file_path
+                    file_path=new_task_result_entity.props.file_path,
+                    source_lang=command.source_lang,
+                    target_lang=command.target_lang
                 )
             )
 

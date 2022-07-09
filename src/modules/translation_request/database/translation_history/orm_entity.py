@@ -37,6 +37,9 @@ class TranslationHistoryOrmEntity(OrmEntityBase):
     
     user_edited_translation = fields.StringField(allow_none=True)
     user_updated_at = fields.DateTimeField(allow_none=True)
+    
+    source_lang = fields.StrField()
+    target_lang = fields.StrField()
 
     class Meta:
         collection_name = database_config.COLLECTIONS['translation_history']['name']

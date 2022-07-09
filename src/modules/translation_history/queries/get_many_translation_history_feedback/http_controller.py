@@ -134,6 +134,9 @@ class GetManyTranslationHistoryFeedback(HTTPMethodView):
         status = request.args['status'] if 'status' in request.args else []
         rating = request.args['rating'] if 'rating' in request.args else []
         
+        source_lang = request.args['source_lang'] if 'source_lang' in request.args else []
+        target_lang = request.args['target_lang'] if 'target_lang' in request.args else []
+        
         created_at__from = request.args.get('createdAt__from', None)
         created_at__to = request.args.get('createdAt__to', None)
         
@@ -163,15 +166,29 @@ class GetManyTranslationHistoryFeedback(HTTPMethodView):
         if not rating is None:
             if type(rating) == list:
                 query['rating'] = {'$in': rating}
+                query['rating'] = {'$in': [None if r == 'not_rated' else r for r in rating]}
             else:
                 query['rating'] = rating
+                query['rating'] = None if rating == 'not_rated' else rating
                 
+        if not source_lang is None:
+            if type(source_lang) == list:
+                query['source_lang'] = {'$in': source_lang}
+            else:
+                query['source_lang'] = source_lang
+                
+        if not target_lang is None:
+            if type(target_lang) == list:
+                query['target_lang'] = {'$in': target_lang}
+            else:
+                query['target_lang'] = target_lang
+        
         if not status is None:
             if type(status) == list:
                 query['status'] = {'$in': status}
             else:
                 query['status'] = status
-
+        print(query['source_lang'])
         if not page is None:
             pagination['page'] = abs(int(page))
             
@@ -247,6 +264,8 @@ class GetManyTranslationHistoryFeedback(HTTPMethodView):
                 'rating': item.props.rating,
                 'sourceText': data['source_text'],
                 'translatedText': data['target_text'],
+                'sourceLang': item.props.source_lang,
+                'targetLang': item.props.target_lang,
                 'userEditedTranslation': item.props.user_edited_translation,
                 'userUpdatedAt': str(item.props.user_updated_at.value)
             })
